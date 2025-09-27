@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>YOU ARE AN IDIOT</title>
+  <title>You Are An Idiot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -10,7 +10,7 @@
       padding: 0;
       font-family: "Times New Roman", serif;
       text-align: center;
-      animation: flash 1.0s infinite;
+      animation: flash 0.3s infinite;
       overflow: hidden;
     }
 
@@ -44,12 +44,12 @@
   </audio>
 
   <script>
-    // Autoplay-Fix für mobile Browser
+    // Musik-Autoplay-Fix für mobile Browser
     document.body.addEventListener("click", function() {
       document.getElementById("idiotSound").play();
     });
 
-    // Popup-Fenster mit Bewegung
+    // Popup-Fenster mit Inhalt und Bewegung
     function openMovingWindow() {
       const w = 300;
       const h = 200;
@@ -74,6 +74,7 @@
       }
     }
 
+    // Bewegung der Fenster
     function moveWindow(win) {
       let x = Math.random() * screen.width;
       let y = Math.random() * screen.height;
