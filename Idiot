@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>You Are An Idiot</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Times New Roman", serif;
+      text-align: center;
+      animation: flash 0.3s infinite;
+    }
+
+    @keyframes flash {
+      0% { background-color: black; color: white; }
+      50% { background-color: white; color: black; }
+      100% { background-color: black; color: white; }
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-top: 80px;
+    }
+
+    .smileys {
+      font-size: 80px;
+      margin-top: 40px;
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>you are an idiot</h1>
+  <div class="smileys">☺ ☺ ☺</div>
+
+  <audio id="idiotSound" autoplay loop>
+    <source src="idiot.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // Autoplay-Fix für mobile Browser
+    document.body.addEventListener("click", function() {
+      document.getElementById("idiotSound").play();
+    });
+  </script>
+</body>
+</html>
