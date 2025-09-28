@@ -33,7 +33,7 @@
     .smile {
       width: 80px;
       height: 80px;
-      border: 4px solid currentColor; /* flackert mit */
+      border: 4px solid currentColor;
       border-radius: 50%;
       position: relative;
     }
@@ -43,7 +43,7 @@
       top: 25px;
       width: 10px;
       height: 10px;
-      background: currentColor; /* flackert mit */
+      background: currentColor;
       border-radius: 50%;
     }
     .smile::before { left: 20px; }
@@ -54,7 +54,7 @@
       left: 50%;
       width: 40px;
       height: 20px;
-      border-bottom: 4px solid currentColor; /* flackert mit */
+      border-bottom: 4px solid currentColor;
       border-radius: 0 0 40px 40px;
       transform: translateX(-50%);
     }
@@ -93,7 +93,7 @@
       // Musik starten (nur Hauptseite)
       audio.play().catch(() => {});
 
-      // Flackern Hauptseite (alle 1s)
+      // Flackern Hauptseite (alle 0,5s)
       setInterval(() => {
         const isBlack = document.body.style.backgroundColor === 'black';
         const bg = isBlack ? 'white' : 'black';
@@ -102,7 +102,7 @@
         document.documentElement.style.color = fg;
         document.body.style.backgroundColor = bg;
         document.body.style.color = fg;
-      }, 1000);
+      }, 500);
 
       // 6 Popups öffnen
       for (let i = 0; i < 6; i++) {
@@ -141,7 +141,7 @@
                   const fg = isBlack ? 'black' : 'white';
                   document.body.style.backgroundColor = bg;
                   document.body.style.color = fg;
-                }, 1000);
+                }, 500);
               <\/script>
             </div>
           </body>
