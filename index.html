@@ -1,113 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+  <title>YOU ARE AN IDIOT ☻</title>
   <meta charset="UTF-8">
-  <title>You Are An Idiot</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: "Times New Roman", serif;
+      background-color: black;
+      color: lime;
+      font-family: monospace;
       text-align: center;
-      animation: flash 0.3s infinite;
-      overflow: hidden;
-    }
-
-    @keyframes flash {
-      0%   { background-color: black; color: white; }
-      50%  { background-color: white; color: black; }
-      100% { background-color: black; color: white; }
-    }
-
-    h1 {
-      font-size: 48px;
       margin-top: 100px;
     }
-
-    .smileys {
-      font-size: 80px;
-      margin-top: 40px;
-    }
-
-    audio {
-      display: none;
+    h1 {
+      font-size: 48px;
     }
   </style>
 </head>
 <body>
-  <h1>you are an idiot</h1>
-  <div class="smileys">☻ ☻ ☻</div>
-
+  <h1>YOU ARE AN IDIOT ☻☻☻</h1>
   <audio id="idiotSound" autoplay loop>
-    <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
+    <source src="laugh.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    // Musik-Autoplay-Fix für mobile Browser
-    document.body.addEventListener("click", function() {
-      document.getElementById("idiotSound").play();
+    // Popup-Loop alle 2 Sekunden
+    setInterval(() => {
+      alert("YOU ARE AN IDIOT ☻");
+    }, 2000);
+
+    // Musik-Fallback bei Autoplay-Block
+    const sound = document.getElementById("idiotSound");
+    document.body.addEventListener("click", () => {
+      sound.play();
     });
-
-    // Popup-Fenster mit Inhalt und Bewegung
-    function openMovingWindow() {
-      const w = 300;
-      const h = 200;
-      const left = Math.floor(Math.random() * (screen.width - w));
-      const top = Math.floor(Math.random() * (screen.height - h));
-      const win = window.open("", "", `width=${w},height=${h},left=${left},top=${top}`);
-      if (win) {
-        win.document.write(`
-          <body style="margin:0; font-family:'Times New Roman',serif; background:black; color:white; text-align:center; animation:flash 0.3s infinite;">
-            <h2>YOU ARE AN IDIOT</h2>
-            <div style="font-size:60px;">☻ ☻ ☻</div>
-          </body>
-          <style>
-            @keyframes flash {
-              0% { background-color: black; color: white; }
-              50% { background-color: white; color: black; }
-              100% { background-color: black; color: white; }
-            }
-          </style>
-        `);
-        moveWindow(win);
-      }
-    }
-
-    // Bewegung der Fenster
-    function moveWindow(win) {
-      let x = Math.random() * screen.width;
-      let y = Math.random() * screen.height;
-      let dx = 5 + Math.random() * 5;
-      let dy = 5 + Math.random() * 5;
-
-      setInterval(() => {
-        x += dx;
-        y += dy;
-        if (x > screen.width - 300 || x < 0) dx = -dx;
-        if (y > screen.height - 200 || y < 0) dy = -dy;
-        try {
-          win.moveTo(x, y);
-        } catch (e) {}
-      }, 50);
-    }
-
-    // Starte Popups nach Klick
-    document.body.addEventListener("click", function() {
-      for (let i = 0; i < 5; i++) {
-        setTimeout(openMovingWindow, i * 500);
-      }
-    });
-    openvirus
-  virus.exe
-    download "roblox.exe" 
-    <script>
-  setTimeout(() => {
-    window.location.href = "https://youareanidiot.cc";
-  }, 180000); // 3 Minuten in Millisekunden
-</script>
-    
-    
   </script>
 </body>
 </html>
