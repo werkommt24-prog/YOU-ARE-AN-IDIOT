@@ -6,33 +6,33 @@
   <style>
     body {
       background-color: black;
-      color: lime;
+      color: white;
       font-family: monospace;
       text-align: center;
       margin-top: 100px;
     }
-    h1 {
-      font-size: 48px;
+    button {
+      font-size: 24px;
+      padding: 10px 20px;
+      background-color: red;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <h1>YOU ARE AN IDIOT ☻☻☻</h1>
-  <audio id="idiotSound" autoplay loop>
-    <source src="laugh.mp3" type="audio/mpeg">
-  </audio>
+  <button onclick="startPopups()">Click Me</button>
 
   <script>
-    // Popup-Loop alle 2 Sekunden
-    setInterval(() => {
-      alert("YOU ARE AN IDIOT ☻");
-    }, 2000);
-
-    // Musik-Fallback bei Autoplay-Block
-    const sound = document.getElementById("idiotSound");
-    document.body.addEventListener("click", () => {
-      sound.play();
-    });
+    function startPopups() {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          window.open("https://youareanidiot.cc", "_blank", "width=400,height=400");
+        }, i * 500); // alle 0.5 Sekunden ein neues Fenster
+      }
+    }
   </script>
 </body>
 </html>
