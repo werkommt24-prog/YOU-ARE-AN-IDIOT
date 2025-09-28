@@ -10,38 +10,37 @@
       font-family: monospace;
       text-align: center;
       margin-top: 100px;
+      transition: background-color 0.1s;
     }
-    button {
-      font-size: 24px;
-      padding: 10px 20px;
-      background-color: red;
-      color: white;
-      border: none;
-      cursor: pointer;
+    h1 {
+      font-size: 48px;
     }
   </style>
 </head>
 <body>
   <h1>YOU ARE AN IDIOT ☻☻☻</h1>
-  <button onclick="startChaos()">Click Me</button>
 
   <audio id="idiotSound" loop>
     <source src="https://ia800304.us.archive.org/27/items/youareanidiotdotorgflash/youareanidiot.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    function startChaos() {
-      // Musik starten
-      const sound = document.getElementById("idiotSound");
-      sound.play();
+    // Flacker-Effekt
+    setInterval(() => {
+      document.body.style.backgroundColor =
+        document.body.style.backgroundColor === "black" ? "red" : "black";
+    }, 200);
 
-      // Echte Popup-Fenster öffnen (nicht redirect!)
-      for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-          window.open("https://youareanidiot.cc", "_blank", "width=400,height=400");
-        }, i * 500);
-      }
-    }
+    // Musik starten nach erstem Klick
+    const sound = document.getElementById("idiotSound");
+    document.body.addEventListener("click", () => {
+      sound.play();
+    }, { once: true });
+
+    // Echte Popup-Fenster alle 2 Sekunden
+    setInterval(() => {
+      window.open("about:blank", "_blank", "width=400,height=400");
+    }, 2000);
   </script>
 </body>
 </html>
