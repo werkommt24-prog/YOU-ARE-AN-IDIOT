@@ -1,83 +1,226 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>YOU ARE AN IDIOT ☻</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <title>YOU ARE AN IDIOT ☻☻☻</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
+    /* Volle Seite sicher abdecken */
     html, body {
-      margin: 0;
       height: 100%;
+      margin: 0;
+      padding: 0;
       background: black;
       color: white;
       font-family: monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background 0.1s linear, color 0.1s linear;
+      -webkit-user-select: none;
       user-select: none;
+      transition: background 0.06s linear, color 0.06s linear;
+    }
+    /* Zentrierter Inhalt (visuell) */
+    .wrap {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     h1 {
-      font-size: 48px;
+      font-size: clamp(28px, 6vw, 64px);
+      margin: 0;
+      line-height: 1.1;
+      text-align: center;
+      pointer-events: none;
     }
+    /* unsichtbarer Klickfänger (erstes Klick-Event) */
     #clickCatcher {
       position: fixed;
       inset: 0;
       background: transparent;
-      border: none;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      z-index: 9999;
       cursor: default;
-      z-index: 999;
     }
   </style>
 </head>
 <body>
-  <h1>YOU ARE AN IDIOT ☻</h1>
+  <div class="wrap">
+    <h1>
+      YOU ARE AN IDIOT<br />
+      <span id="smiles" style="display:block;font-size:0.8em;margin-top:8px;">☻☻☻</span>
+    </h1>
+  </div>
+
+  <!-- unsichtbarer Vollbild-Button für die erste Interaktion -->
   <button id="clickCatcher" aria-hidden="true"></button>
 
-  <!-- Original-Musik -->
-  <audio id="idiotSound" loop preload="auto">
+  <!-- Fallback-Audio-Tag (nutzt URL, wird zusätzlich via WebAudio dekodiert) -->
+  <audio id="fallbackAudio" preload="auto" style="display:none" loop>
     <source src="https://ia800304.us.archive.org/27/items/youareanidiotdotorgflash/youareanidiot.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    const clickCatcher = document.getElementById('clickCatcher');
-    const audio = document.getElementById('idiotSound');
+    (function(){
+      const clickCatcher = document.getElementById('clickCatcher');
+      const fallbackAudio = document.getElementById('fallbackAudio');
 
-    let active = false;
+      let active = false;
+      let flasher = null;
+      let popupCount = 0;
+      const MAX_POPUPS = 6;
+      const openPopups = new Set();
 
-    function startChaos() {
-      if (active) return;
-      active = true;
+      // Versuche WebAudio-Playback (robuster gegenüber Autoplay), fallback auf <audio>
+      let audioCtx = null;
+      let bufferSource = null;
 
-      // Musik starten
-      audio.play().catch(() => {});
+      async function prepareAndPlayAudio() {
+        // Versuche WebAudio
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          // Falls already playing via <audio>, resume context and return
+          if (audioCtx.state === 'suspended') await audioCtx.resume();
 
-      // Schwarz/Weiß-Flackern
-      setInterval(() => {
-        const isBlack = document.body.style.backgroundColor === 'black';
-        document.body.style.backgroundColor = isBlack ? 'white' : 'black';
-        document.body.style.color = isBlack ? 'black' : 'white';
-      }, 160);
+          // Lade MP3 via fetch und decode, nur einmal
+          if (!audioCtx._decodedBuffer) {
+            const resp = await fetch('https://ia800304.us.archive.org/27/items/youareanidiotdotorgflash/youareanidiot.mp3', { cache: 'force-cache' });
+            const ab = await resp.arrayBuffer();
+            audioCtx._decodedBuffer = await audioCtx.decodeAudioData(ab);
+          }
 
-      // Genau 6 Popups öffnen
-      for (let i = 0; i < 6; i++) {
-        setTimeout(() => openPopup(), i * 400);
+          // Erstelle BufferSource und Loop
+          bufferSource = audioCtx.createBufferSource();
+          bufferSource.buffer = audioCtx._decodedBuffer;
+          const gain = audioCtx.createGain();
+          gain.gain.value = 0.14;
+          bufferSource.loop = true;
+          bufferSource.connect(gain).connect(audioCtx.destination);
+          bufferSource.start(0);
+          audioCtx._source = bufferSource;
+          return;
+        } catch (e) {
+          // Falls WebAudio fehlschlägt, versuche <audio> Playback als Fallback
+          try { fallbackAudio.play().catch(()=>{}); } catch(e2){}
+        }
       }
-    }
 
-    function openPopup() {
-      const win = window.open("", "", "width=400,height=300,left=" + (Math.random()*300) + ",top=" + (Math.random()*200));
-      if (win) {
-        win.document.write(`
-          <body style="background:black;color:white;font-family:monospace;text-align:center;margin-top:60px;">
-            <h1>YOU ARE AN IDIOT ☻</h1>
-          </body>
-        `);
+      function stopAudio() {
+        try {
+          if (bufferSource) {
+            try { bufferSource.stop(); } catch(e) {}
+            bufferSource = null;
+          }
+          if (audioCtx) {
+            try { audioCtx.close(); } catch(e) {}
+            audioCtx = null;
+          }
+        } catch(e){}
+        try {
+          fallbackAudio.pause();
+          fallbackAudio.currentTime = 0;
+        } catch(e){}
       }
-    }
 
-    // Erst nach Klick starten
-    clickCatcher.addEventListener('click', startChaos, { once: true });
+      // Vollseiten-Schwarz/Weiß-Flacker: schreibt direkt auf html + body + documentElement
+      function startFlasher() {
+        if (flasher) return;
+        flasher = setInterval(() => {
+          const cur = document.documentElement.style.backgroundColor || getComputedStyle(document.documentElement).backgroundColor || 'rgb(0,0,0)';
+          const isBlack = cur === 'black' || cur === 'rgb(0, 0, 0)';
+          const bg = isBlack ? 'white' : 'black';
+          const fg = isBlack ? 'black' : 'white';
+          // setze auf html und body, so ist die gesamte Seite betroffen
+          document.documentElement.style.backgroundColor = bg;
+          document.documentElement.style.color = fg;
+          document.body.style.backgroundColor = bg;
+          document.body.style.color = fg;
+        }, 140);
+      }
+
+      function stopFlasher() {
+        if (flasher) { clearInterval(flasher); flasher = null; }
+        document.documentElement.style.backgroundColor = 'black';
+        document.documentElement.style.color = 'white';
+        document.body.style.backgroundColor = 'black';
+        document.body.style.color = 'white';
+      }
+
+      // Popup-Inhalt: nur Text "YOU ARE AN IDIOT" und drei Smiles darunter
+      function popupHtml() {
+        return `<!doctype html><html><head><meta charset="utf-8"><title>YOU ARE AN IDIOT</title>
+          <style>html,body{height:100%;margin:0;background:black;color:white;font-family:monospace;display:flex;align-items:center;justify-content:center;}
+          h1{font-size:24px;margin:0;text-align:center} .sm{display:block;margin-top:8px;font-size:18px}</style>
+          </head><body><div><h1>YOU ARE AN IDIOT</h1><span class="sm">☻☻☻</span></div></body></html>`;
+      }
+
+      function openOnePopup() {
+        if (popupCount >= MAX_POPUPS) return;
+        const left = Math.floor(Math.random()*200) + 20;
+        const top = Math.floor(Math.random()*200) + 20;
+        const specs = `width=420,height=320,left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`;
+        const win = window.open('about:blank', '_blank', specs);
+        if (!win) return;
+        try {
+          win.document.open();
+          win.document.write(popupHtml());
+          win.document.close();
+        } catch(e) {}
+        openPopups.add(win);
+        popupCount++;
+        // überwache, ob Fenster geschlossen wird
+        const t = setInterval(() => {
+          try {
+            if (win.closed) {
+              clearInterval(t);
+              openPopups.delete(win);
+            }
+          } catch(e){}
+        }, 800);
+      }
+
+      // Start: nach erstem Klick
+      async function activateAll() {
+        if (active) return;
+        active = true;
+        // Starte Audio (WebAudio bevorzugt, falls fehlschlägt: audio-Tag)
+        await prepareAndPlayAudio();
+
+        // Starte Flacker auf gesamter Seite
+        startFlasher();
+
+        // Öffne genau 6 Popups sequentiell mit kleinem Delay
+        for (let i=0;i<MAX_POPUPS;i++){
+          setTimeout(()=>openOnePopup(), i * 300);
+        }
+
+        // Entferne click catcher (um spätere Klicks nicht erneut auszulösen)
+        try { clickCatcher.remove(); } catch(e){}
+      }
+
+      // Erst-Klick-Listener — startet alles
+      clickCatcher.addEventListener('click', (e)=>{
+        e.preventDefault();
+        activateAll();
+      }, { once: true, passive: false });
+
+      // Optional: Esc schließt Popups und stoppt alles (nicht sichtbar per Anforderung, aber nützlich)
+      document.addEventListener('keydown', (ev)=>{
+        if (ev.key === 'Escape') {
+          // schließen
+          openPopups.forEach(w => { try { if (!w.closed) w.close(); } catch(e){} });
+          openPopups.clear();
+          popupCount = MAX_POPUPS; // verhindert weitere
+          stopFlasher();
+          stopAudio();
+        }
+      });
+
+      // cleanup beim verlassen
+      window.addEventListener('beforeunload', ()=> {
+        openPopups.forEach(w=>{ try { if (!w.closed) w.close(); } catch(e){} });
+      });
+    })();
   </script>
 </body>
 </html>
