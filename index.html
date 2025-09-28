@@ -6,7 +6,7 @@
   <style>
     body {
       background-color: black;
-      color: white;
+      color: lime;
       font-family: monospace;
       text-align: center;
       margin-top: 100px;
@@ -23,14 +23,21 @@
 </head>
 <body>
   <h1>YOU ARE AN IDIOT ☻☻☻</h1>
-  <button onclick="startPopups()">Click Me</button>
+  <button onclick="startChaos()">Click Me</button>
+
+  <audio id="idiotSound" loop>
+    <source src="https://ia800304.us.archive.org/27/items/youareanidiotdotorgflash/youareanidiot.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
-    function startPopups() {
+    function startChaos() {
+      const sound = document.getElementById("idiotSound");
+      sound.play();
+
       for (let i = 0; i < 5; i++) {
         setTimeout(() => {
           window.open("https://youareanidiot.cc", "_blank", "width=400,height=400");
-        }, i * 500); // alle 0.5 Sekunden ein neues Fenster
+        }, i * 500);
       }
     }
   </script>
