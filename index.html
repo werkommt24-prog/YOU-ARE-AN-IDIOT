@@ -93,14 +93,14 @@
       // Musik starten
       audio.play().catch(() => {});
 
-      // Flackern Hauptseite
+      // Flackern Hauptseite (alle 1,5s)
       setInterval(() => {
         const isBlack = document.body.style.backgroundColor === 'black';
         document.documentElement.style.backgroundColor = isBlack ? 'white' : 'black';
         document.documentElement.style.color = isBlack ? 'black' : 'white';
         document.body.style.backgroundColor = isBlack ? 'white' : 'black';
         document.body.style.color = isBlack ? 'black' : 'white';
-      }, 1000);
+      }, 1500);
 
       // 6 Popups öffnen
       for (let i = 0; i < 6; i++) {
@@ -140,7 +140,7 @@
                   const isBlack = document.body.style.backgroundColor === 'black';
                   document.body.style.backgroundColor = isBlack ? 'white' : 'black';
                   document.body.style.color = isBlack ? 'black' : 'white';
-                }, 1000);
+                }, 1500);
               <\/script>
             </div>
           </body>
