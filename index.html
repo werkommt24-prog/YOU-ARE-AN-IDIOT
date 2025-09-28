@@ -5,141 +5,170 @@
   <title>you are an idiot ☻☻☻</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root { --bg-black: #000; --bg-white: #fff; --fg-white: #fff; --fg-black: #000; }
-    html,body { height:100%; margin:0; background:var(--bg-black); color:var(--fg-white);
-      font-family:"Times New Roman", serif; display:flex; align-items:center; justify-content:center; user-select:none; }
-    h1 { font-size:84px; margin:0; font-weight:normal; text-align:center; }
-    .smiles { display:flex; gap:36px; justify-content:center; margin-top:28px; }
-    .smile { width:80px; height:80px; border:4px solid var(--fg-white); border-radius:50%; position:relative; box-sizing:border-box; }
-    .smile::before, .smile::after { content:""; position:absolute; top:26px; width:10px; height:10px; background:var(--fg-white); border-radius:50%; }
-    .smile::before { left:20px } .smile::after { right:20px }
-    .mouth { position:absolute; left:50%; bottom:18px; width:44px; height:20px; transform:translateX(-50%); border-bottom:4px solid var(--fg-white); border-radius:0 0 44px 44px; box-sizing:border-box; }
-    .invert { border-color:var(--fg-black) !important; }
-    .invert::before, .invert::after { background:var(--fg-black) !important; }
-    .invert .mouth { border-bottom-color:var(--fg-black) !important; }
-    #clickCatcher { position:fixed; inset:0; background:transparent; border:0; cursor:pointer; z-index:999; }
+    :root { --bg-black:#000; --bg-white:#fff; --fg-white:#fff; --fg-black:#000; }
+    html,body{height:100%;margin:0;background:var(--bg-black);color:var(--fg-white);
+      font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center;user-select:none;}
+    h1{font-size:84px;margin:0;font-weight:normal;text-align:center;}
+    .smiles{display:flex;gap:36px;justify-content:center;margin-top:28px;}
+    .smile{width:80px;height:80px;border:4px solid var(--fg-white);border-radius:50%;position:relative;box-sizing:border-box;
+      display:flex;align-items:center;justify-content:center;background:transparent;}
+    .eye{position:absolute;top:26px;width:10px;height:10px;background:var(--fg-white);border-radius:50%;}
+    .eye.left{left:20px} .eye.right{right:20px}
+    .mouth-svg{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:56px;height:28px;overflow:visible;}
+    .invert{border-color:var(--fg-black) !important;}
+    .invert .eye{background:var(--fg-black) !important;}
+    .invert .mouth-path{stroke:var(--fg-black) !important;}
+    #clickCatcher{position:fixed;inset:0;background:transparent;border:0;cursor:pointer;z-index:999;}
   </style>
 </head>
 <body>
   <div>
     <h1>you are an idiot</h1>
     <div class="smiles">
-      <div class="smile"><div class="mouth"></div></div>
-      <div class="smile"><div class="mouth"></div></div>
-      <div class="smile"><div class="mouth"></div></div>
+      <div class="smile">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <svg class="mouth-svg" viewBox="0 0 56 28" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="smile">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <svg class="mouth-svg" viewBox="0 0 56 28" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="smile">
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <svg class="mouth-svg" viewBox="0 0 56 28" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
     </div>
   </div>
 
-  <!-- unsichtbares Klickfeld; ein Klick startet alles (nur einmal) -->
   <button id="clickCatcher" aria-hidden="true" title="Klick zum Start"></button>
 
-  <!-- Musik nur im Hauptfenster, aber nicht automatisch starten -->
   <audio id="idiotSound" loop preload="auto">
     <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    (function () {
+    (function(){
       const clickCatcher = document.getElementById('clickCatcher');
       const audio = document.getElementById('idiotSound');
       let flackerIntervalId = null;
-      const FLACKER_MS = 400; // gewünschtes Tempo (ändere hier)
+      const FLACKER_MS = 400;
 
-      function setColors(bgIsBlack) {
-        const bg = bgIsBlack ? getComputedStyle(document.documentElement).getPropertyValue('--bg-black').trim() : getComputedStyle(document.documentElement).getPropertyValue('--bg-white').trim();
-        const fg = bgIsBlack ? getComputedStyle(document.documentElement).getPropertyValue('--fg-white').trim() : getComputedStyle(document.documentElement).getPropertyValue('--fg-black').trim();
+      function setColors(isBlack) {
+        const bg = isBlack ? '#000' : '#fff';
+        const fg = isBlack ? '#fff' : '#000';
         document.documentElement.style.background = bg;
         document.body.style.background = bg;
         document.body.style.color = fg;
 
-        document.querySelectorAll('.smile').forEach(s => {
-          if (bg === '#fff' || bg.toLowerCase().includes('fff')) s.classList.add('invert');
-          else s.classList.remove('invert');
+        document.querySelectorAll('.smile').forEach(s=>{
+          const eyes = s.querySelectorAll('.eye');
+          const mouthPath = s.querySelector('.mouth-path');
+          if (!eyes.length || !mouthPath) return;
+          if (bg === '#fff') {
+            s.classList.add('invert');
+            eyes.forEach(e=>e.style.background = '#000');
+            mouthPath.setAttribute('stroke','#000');
+            s.style.borderColor = '#000';
+          } else {
+            s.classList.remove('invert');
+            eyes.forEach(e=>e.style.background = '#fff');
+            mouthPath.setAttribute('stroke','#fff');
+            s.style.borderColor = '#fff';
+          }
         });
       }
 
-      function startFlackern() {
-        if (flackerIntervalId !== null) return; // schon gestartet, nicht nochmal
-        // Initial setzen (aktuell schwarzer Hintergrund)
+      function startFlackern(){
+        if (flackerIntervalId !== null) return;
         let isBlack = true;
         setColors(isBlack);
-        flackerIntervalId = setInterval(() => {
+        flackerIntervalId = setInterval(()=>{
           isBlack = !isBlack;
           setColors(isBlack);
         }, FLACKER_MS);
       }
 
-      function openPopups(count = 6) {
-        for (let i = 0; i < count; i++) {
-          // Öffne Popup ohne Audio-Tag darin (Audio läuft nur im Hauptfenster)
-          const left = Math.floor(Math.random() * 300);
-          const top = Math.floor(Math.random() * 200);
+      function openPopups(count = 6){
+        for (let i=0;i<count;i++){
+          const left = Math.floor(Math.random()*300);
+          const top = Math.floor(Math.random()*200);
           const win = window.open("", "", `width=600,height=400,left=${left},top=${top}`);
           if (!win) continue;
-          // Schreibe minimal identischen HTML-Block (keine audio-tags)
-          win.document.write(`
-            <!doctype html>
-            <html>
-              <head>
-                <meta charset="utf-8"/>
-                <meta name="viewport" content="width=device-width,initial-scale=1"/>
-                <title>you are an idiot</title>
-                <style>
-                  html,body{height:100%;margin:0;background:#000;color:#fff;font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center;}
-                  h1{font-size:80px;margin:0;font-weight:normal;text-align:center}
-                  .smiles{display:flex;gap:36px;justify-content:center;margin-top:28px}
-                  .smile{width:70px;height:70px;border:4px solid #fff;border-radius:50%;position:relative;box-sizing:border-box}
-                  .smile::before,.smile::after{content:"";position:absolute;top:20px;width:10px;height:10px;background:#fff;border-radius:50%}
-                  .smile::before{left:15px}.smile::after{right:15px}
-                  .mouth{position:absolute;left:50%;bottom:15px;width:35px;height:15px;transform:translateX(-50%);border-bottom:4px solid #fff;border-radius:0 0 35px 35px;box-sizing:border-box}
-                </style>
-              </head>
-              <body>
-                <div style="text-align:center">
-                  <h1>you are an idiot</h1>
-                  <div class="smiles">
-                    <div class="smile"><div class="mouth"></div></div>
-                    <div class="smile"><div class="mouth"></div></div>
-                    <div class="smile"><div class="mouth"></div></div>
-                  </div>
+          win.document.write(`<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>you are an idiot</title>
+            <style>
+              html,body{height:100%;margin:0;background:#000;color:#fff;font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center;}
+              h1{font-size:80px;margin:0;font-weight:normal;text-align:center}
+              .smiles{display:flex;gap:36px;justify-content:center;margin-top:28px}
+              .smile{width:70px;height:70px;border:4px solid #fff;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+              .eye{position:absolute;top:20px;width:10px;height:10px;background:#fff;border-radius:50%}
+              .eye.left{left:15px}.eye.right{right:15px}
+              .mouth-svg{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:46px;height:24px}
+            </style></head><body>
+            <div style="text-align:center">
+              <h1>you are an idiot</h1>
+              <div class="smiles">
+                <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+                  <svg class="mouth-svg" viewBox="0 0 56 28" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                    <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                  </svg>
                 </div>
-                <script>
-                  // Popup flackert lokal, synchroner Wechsel durch Lesen des body background
-                  let lastIsBlack = true;
-                  setInterval(() => {
-                    const isBlack = document.body.style.backgroundColor === 'black' || document.body.style.backgroundColor === '' ? true : (document.body.style.backgroundColor === 'white' ? false : !lastIsBlack);
-                    const bg = isBlack ? 'white' : 'black';
-                    const fg = isBlack ? 'black' : 'white';
-                    document.body.style.backgroundColor = bg;
-                    document.body.style.color = fg;
-                    document.querySelectorAll('.smile').forEach(s=>{
-                      s.style.borderColor = fg;
-                      s.querySelectorAll('div').forEach(d=>d.style.background = fg);
-                      s.querySelector('.mouth').style.borderBottomColor = fg;
-                    });
-                    lastIsBlack = !lastIsBlack;
-                  }, ${FLACKER_MS});
-                <\/script>
-              </body>
-            </html>
-          `);
-          // optional: focus the popup briefly
-          try { win.focus(); } catch(e){}
+
+                <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+                  <svg class="mouth-svg" viewBox="0 0 56 28" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                    <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                  </svg>
+                </div>
+
+                <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+                  <svg class="mouth-svg" viewBox="0 0 56 28" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                    <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <script>
+              let last = true;
+              const FL = ${FLACKER_MS};
+              setInterval(()=>{
+                last = !last;
+                const bg = last ? 'black' : 'white';
+                const fg = last ? 'white' : 'black';
+                document.body.style.background = bg;
+                document.body.style.color = fg;
+                document.querySelectorAll('.smile').forEach(s=>{
+                  s.style.borderColor = fg;
+                  s.querySelectorAll('.eye').forEach(e=>e.style.background = fg);
+                  const p = s.querySelector('.mouth-path');
+                  if(p) p.setAttribute('stroke', fg);
+                });
+              }, FL);
+            <\/script>
+            </body></html>`);
+          try{ win.focus(); }catch(e){}
         }
       }
 
-      function startChaosOnce() {
-        // nur einmal ausführen
+      function startChaosOnce(){
         startFlackern();
-        // Musik starten (dieser play() wird nur durch echten user-click ausgelöst und funktioniert typischerweise)
-        audio.play().catch(()=>{ /* still silent if browser blocks; but since triggered by click it should work */ });
+        audio.play().catch(()=>{});
         openPopups(6);
       }
 
-      // Klick nur einmal: startet Musik + Popups + Flackern
-      clickCatcher.addEventListener('click', function handleClick() {
-        clickCatcher.removeEventListener('click', handleClick);
-        clickCatcher.remove(); // entferne unsichtbares Button
+      clickCatcher.addEventListener('click', function handler(){
+        clickCatcher.removeEventListener('click', handler);
+        clickCatcher.remove();
         startChaosOnce();
       });
     })();
