@@ -19,15 +19,15 @@
       user-select: none;
     }
     h1 {
-      font-size: 80px; /* größere Schrift */
+      font-size: 100px;
       margin: 0;
       text-align: center;
       line-height: 1.2;
     }
     .smiles {
       display: block;
-      margin-top: 15px;
-      font-size: 50px;
+      margin-top: 20px;
+      font-size: 70px;
       text-align: center;
     }
     #clickCatcher {
@@ -56,13 +56,9 @@
   <script>
     const clickCatcher = document.getElementById('clickCatcher');
     const audio = document.getElementById('idiotSound');
-    let active = false;
 
     function startChaos() {
-      if (active) return;
-      active = true;
-
-      // Musik starten
+      // Musik starten (nach Klick erlaubt)
       audio.play().catch(() => {});
 
       // Schwarz/Weiß-Flackern für den ganzen Bildschirm
@@ -74,27 +70,28 @@
         document.body.style.color = isBlack ? 'black' : 'white';
       }, 160);
 
-      // Genau 6 Popups öffnen
+      // 6 Popups gleichzeitig öffnen
       for (let i = 0; i < 6; i++) {
-        setTimeout(() => openPopup(), i * 400);
+        openPopup();
       }
     }
 
     function openPopup() {
-      const win = window.open("", "", "width=500,height=400,left=" + (Math.random()*300) + ",top=" + (Math.random()*200));
+      const win = window.open("", "", "width=600,height=400,left=" + (Math.random()*300) + ",top=" + (Math.random()*200));
       if (win) {
         win.document.write(`
           <body style="margin:0;height:100%;display:flex;align-items:center;justify-content:center;background:black;color:white;font-family:monospace;">
             <div style="text-align:center;">
-              <h1 style="font-size:60px;margin:0;">YOU ARE AN IDIOT</h1>
-              <div style="font-size:40px;margin-top:15px;">☻ ☻ ☻</div>
+              <h1 style="font-size:80px;margin:0;">YOU ARE AN IDIOT</h1>
+              <div style="font-size:60px;margin-top:20px;">☻ ☻ ☻</div>
             </div>
           </body>
         `);
       }
     }
 
-    clickCatcher.addEventListener('click', startChaos, { once: true });
+    // Bei jedem Klick → 6 Popups + Flackern + Musik
+    clickCatcher.addEventListener('click', startChaos);
   </script>
 </body>
 </html>
