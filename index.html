@@ -41,7 +41,7 @@
   const FLACKER_MS = 500;
   const POPUP_INTERVAL_MS = 5000;
   const AUDIO_URL = 'https://files.catbox.moe/pnlmyb.mp3';
-  let isBlack = true, audioCtx, musicBuffer, popupTimer;
+  let isBlack = true, popupTimer;
 
   // Farben invertieren
   function applyColors(doc=document){
@@ -56,20 +56,6 @@
   }
   function startFlackern(doc=document){
     setInterval(()=>{isBlack=!isBlack;applyColors(doc);},FLACKER_MS);
-  }
-
-  // Musik
-  async function loadAudio(){
-    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    const resp=await fetch(AUDIO_URL); const ab=await resp.arrayBuffer();
-    musicBuffer=await audioCtx.decodeAudioData(ab);
-  }
-  async function playMusic(){
-    if(!musicBuffer) await loadAudio();
-    if(audioCtx.state==='suspended') await audioCtx.resume();
-    const src=audioCtx.createBufferSource();
-    src.buffer=musicBuffer; src.loop=true;
-    src.connect(audioCtx.destination); src.start(0);
   }
 
   // Popup
@@ -125,7 +111,18 @@
   // Start
   document.getElementById('clickCatcher').addEventListener('click', async ()=>{
     document.getElementById('clickCatcher').remove();
-    await playMusic();
+
+    // Musik direkt im Klick starten
+    try {
+      audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+      const resp=await fetch(AUDIO_URL);
+      const ab=await resp.arrayBuffer();
+      musicBuffer=await audioCtx.decodeAudioData(ab);
+      const src=audioCtx.createBufferSource();
+      src.buffer=musicBuffer; src.loop=true;
+      src.connect(audioCtx.destination); src.start(0);
+    } catch(e){ console.warn("Audio error",e); }
+
     startFlackern(document);
     openPopup(); // sofort 1
     popupTimer=setInterval(openPopup,POPUP_INTERVAL_MS);
