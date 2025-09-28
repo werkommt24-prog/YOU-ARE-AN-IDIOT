@@ -100,7 +100,7 @@
       clickCatcher.remove();
       audio.play().catch(() => {});
 
-      // Flackern Hauptseite (alle 300ms)
+      // Flackern Hauptseite (alle 400ms)
       setInterval(() => {
         const isBlack = document.body.style.backgroundColor === 'black';
         const bg = isBlack ? 'white' : 'black';
@@ -115,7 +115,7 @@
             s.classList.remove('invert');
           }
         });
-      }, 300);
+      }, 400);
 
       // Popups öffnen
       for (let i = 0; i < 6; i++) {
@@ -160,7 +160,7 @@
                     s.querySelectorAll('div').forEach(d => d.style.background = fg);
                     s.querySelector('.mouth').style.borderBottomColor = fg;
                   });
-                }, 300);
+                }, 400);
               <\/script>
             </div>
           </body>
