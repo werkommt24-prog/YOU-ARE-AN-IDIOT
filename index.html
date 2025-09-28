@@ -31,9 +31,11 @@
 
   <script>
     function startChaos() {
+      // Musik starten
       const sound = document.getElementById("idiotSound");
       sound.play();
 
+      // Echte Popup-Fenster öffnen (nicht redirect!)
       for (let i = 0; i < 5; i++) {
         setTimeout(() => {
           window.open("https://youareanidiot.cc", "_blank", "width=400,height=400");
