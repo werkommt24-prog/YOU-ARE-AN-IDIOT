@@ -66,6 +66,14 @@
     .invert .mouth {
       border-bottom-color: black !important;
     }
+    #clickCatcher {
+      position: fixed;
+      inset: 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
@@ -78,36 +86,42 @@
     </div>
   </div>
 
-  <!-- Musik im Hauptfenster -->
-  <audio id="idiotSound" loop autoplay>
+  <button id="clickCatcher" aria-hidden="true"></button>
+
+  <audio id="idiotSound" loop preload="auto">
     <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    // Flackern Hauptseite (alle 100ms)
-    setInterval(() => {
-      const isBlack = document.body.style.backgroundColor === 'black';
-      const bg = isBlack ? 'white' : 'black';
-      const fg = isBlack ? 'black' : 'white';
-      document.body.style.backgroundColor = bg;
-      document.body.style.color = fg;
+    const clickCatcher = document.getElementById('clickCatcher');
+    const audio = document.getElementById('idiotSound');
 
-      // Smileys invertieren
-      document.querySelectorAll('.smile').forEach(s => {
-        if (bg === 'white') {
-          s.classList.add('invert');
-        } else {
-          s.classList.remove('invert');
-        }
-      });
-    }, 100);
+    function startChaos() {
+      // Musik starten
+      audio.play().catch(() => {});
 
-    // Popups direkt beim Laden öffnen
-    window.onload = () => {
+      // Flackern Hauptseite (alle 100ms)
+      setInterval(() => {
+        const isBlack = document.body.style.backgroundColor === 'black';
+        const bg = isBlack ? 'white' : 'black';
+        const fg = isBlack ? 'black' : 'white';
+        document.body.style.backgroundColor = bg;
+        document.body.style.color = fg;
+
+        document.querySelectorAll('.smile').forEach(s => {
+          if (bg === 'white') {
+            s.classList.add('invert');
+          } else {
+            s.classList.remove('invert');
+          }
+        });
+      }, 100);
+
+      // Popups öffnen
       for (let i = 0; i < 6; i++) {
         openPopup();
       }
-    };
+    }
 
     function openPopup() {
       const win = window.open("", "", "width=600,height=400,left=" + (Math.random()*300) + ",top=" + (Math.random()*200));
@@ -133,7 +147,7 @@
                   <div class="mouth" style="position:absolute;bottom:15px;left:50%;width:35px;height:15px;border-bottom:4px solid white;border-radius:0 0 35px 35px;transform:translateX(-50%);"></div>
                 </div>
               </div>
-              <audio id="popupSound" loop autoplay>
+              <audio autoplay loop>
                 <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
               </audio>
               <script>
@@ -156,6 +170,12 @@
         `);
       }
     }
+
+    // Chaos startet erst nach Klick
+    clickCatcher.addEventListener('click', () => {
+      clickCatcher.remove(); // Button entfernen
+      startChaos();
+    });
   </script>
 </body>
 </html>
