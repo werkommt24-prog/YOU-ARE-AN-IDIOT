@@ -28,110 +28,56 @@
       cursor: default;
       z-index: 999;
     }
-    #stopOverlay {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      border: 1px solid white;
-      padding: 6px 12px;
-      font-size: 14px;
-      font-family: monospace;
-      display: none;
-      cursor: pointer;
-      z-index: 1000;
-    }
   </style>
 </head>
 <body>
   <h1>YOU ARE AN IDIOT ☻</h1>
   <button id="clickCatcher" aria-hidden="true"></button>
-  <div id="stopOverlay">STOP (Esc)</div>
 
+  <!-- Original-Musik -->
   <audio id="idiotSound" loop preload="auto">
     <source src="https://ia800304.us.archive.org/27/items/youareanidiotdotorgflash/youareanidiot.mp3" type="audio/mpeg">
   </audio>
 
   <script>
     const clickCatcher = document.getElementById('clickCatcher');
-    const stopOverlay = document.getElementById('stopOverlay');
     const audio = document.getElementById('idiotSound');
 
     let active = false;
-    let flasher = null;
-    let popupTimer = null;
-    const openPopups = new Set();
 
     function startChaos() {
       if (active) return;
       active = true;
-      stopOverlay.style.display = 'inline-block';
 
       // Musik starten
       audio.play().catch(() => {});
 
-      // Schwarz–Weiß-Flackern
-      flasher = setInterval(() => {
+      // Schwarz/Weiß-Flackern
+      setInterval(() => {
         const isBlack = document.body.style.backgroundColor === 'black';
         document.body.style.backgroundColor = isBlack ? 'white' : 'black';
         document.body.style.color = isBlack ? 'black' : 'white';
       }, 160);
 
-      // Popups starten
-      let count = 1;
-      for (let i = 0; i < 5; i++) {
-        setTimeout(() => openPopup(count++), i * 300);
+      // Genau 6 Popups öffnen
+      for (let i = 0; i < 6; i++) {
+        setTimeout(() => openPopup(), i * 400);
       }
-      popupTimer = setInterval(() => openPopup(count++), 1500);
     }
 
-    function openPopup(id) {
-      const win = window.open("", "", "width=400,height=300,left=" + (Math.random()*200) + ",top=" + (Math.random()*200));
+    function openPopup() {
+      const win = window.open("", "", "width=400,height=300,left=" + (Math.random()*300) + ",top=" + (Math.random()*200));
       if (win) {
         win.document.write(`
           <body style="background:black;color:white;font-family:monospace;text-align:center;margin-top:60px;">
             <h1>YOU ARE AN IDIOT ☻</h1>
-            <p>Popup #${id}</p>
           </body>
         `);
-        openPopups.add(win);
-        const checker = setInterval(() => {
-          if (win.closed) {
-            clearInterval(checker);
-            openPopups.delete(win);
-          }
-        }, 1000);
       }
     }
 
-    function stopChaos() {
-      if (!active) return;
-      active = false;
-      stopOverlay.style.display = 'none';
-
-      audio.pause();
-      audio.currentTime = 0;
-
-      clearInterval(flasher);
-      document.body.style.backgroundColor = 'black';
-      document.body.style.color = 'white';
-
-      clearInterval(popupTimer);
-      openPopups.forEach(win => {
-        try { if (!win.closed) win.close(); } catch(e) {}
-      });
-      openPopups.clear();
-    }
-
+    // Erst nach Klick starten
     clickCatcher.addEventListener('click', startChaos, { once: true });
-    stopOverlay.addEventListener('click', stopChaos);
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') stopChaos();
-    });
-    document.addEventListener('click', () => {
-      if (active) audio.play().catch(() => {});
-    });
   </script>
 </body>
 </html>
