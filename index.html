@@ -1,232 +1,136 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <title>you are an idiot ☻☻☻</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root { --bg-black:#000; --bg-white:#fff; --fg-white:#fff; --fg-black:#000; --unit: min(12vw, 12vh); }
-    html, body {
-      height: 100%; margin: 0; background: var(--bg-black); color: var(--fg-white);
-      font-family: "Times New Roman", serif; display: flex; align-items: center; justify-content: center; user-select: none;
-    }
-    h1 { font-size: clamp(60px, 10vw, 140px); margin: 0; font-weight: normal; text-align: center; }
-    .smiles { display: flex; gap: calc(var(--unit) * 0.35); justify-content: center; margin-top: calc(var(--unit) * 0.25); }
-    .smile {
-      width: calc(var(--unit) * 1.2); height: calc(var(--unit) * 1.2);
-      border: 4px solid var(--fg-white); border-radius: 50%;
-      position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box; background: transparent;
-    }
-    .eye {
-      position: absolute; top: calc(var(--unit) * 0.35);
-      width: calc(var(--unit) * 0.18); height: calc(var(--unit) * 0.18);
-      background: var(--fg-white); border-radius: 50%;
-    }
-    .eye.left { left: calc(var(--unit) * 0.30); }
-    .eye.right { right: calc(var(--unit) * 0.30); }
-    .mouth-svg {
-      position: absolute; bottom: calc(var(--unit) * 0.22); left: 50%; transform: translateX(-50%);
-      width: calc(var(--unit) * 0.8); height: calc(var(--unit) * 0.36); overflow: visible;
-    }
-    #clickCatcher { position: fixed; inset: 0; background: transparent; border: 0; cursor: pointer; z-index: 999; }
-  </style>
+<meta charset="utf-8"/>
+<title>you are an idiot ☻☻☻</title>
+<style>
+  html,body{height:100%;margin:0;background:#000;color:#fff;
+    font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center;user-select:none}
+  h1{font-size:84px;margin:0;font-weight:normal;text-align:center}
+  .smiles{display:flex;gap:40px;justify-content:center;margin-top:30px}
+  .smile{width:120px;height:120px;border:4px solid #fff;border-radius:50%;
+    position:relative;display:flex;align-items:center;justify-content:center}
+  .eye{position:absolute;top:34px;width:18px;height:18px;background:#fff;border-radius:50%}
+  .eye.left{left:30px}.eye.right{right:30px}
+  .mouth-svg{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:80px;height:36px}
+  #clickCatcher{position:fixed;inset:0;background:transparent;border:0;cursor:pointer;z-index:999}
+</style>
 </head>
 <body>
   <div>
     <h1>you are an idiot</h1>
     <div class="smiles">
-      <div class="smile">
-        <div class="eye left"></div><div class="eye right"></div>
-        <svg class="mouth-svg" viewBox="0 0 56 28" aria-hidden="true">
-          <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-        </svg>
+      <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+        <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path"
+          d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
       </div>
-      <div class="smile">
-        <div class="eye left"></div><div class="eye right"></div>
-        <svg class="mouth-svg" viewBox="0 0 56 28" aria-hidden="true">
-          <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-        </svg>
+      <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+        <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path"
+          d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
       </div>
-      <div class="smile">
-        <div class="eye left"></div><div class="eye right"></div>
-        <svg class="mouth-svg" viewBox="0 0 56 28" aria-hidden="true">
-          <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-        </svg>
+      <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+        <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path"
+          d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
       </div>
     </div>
   </div>
+  <button id="clickCatcher"></button>
 
-  <button id="clickCatcher" aria-hidden="true" title="Klick zum Start"></button>
+<script>
+(function(){
+  const FLACKER_MS = 500;
+  const POPUP_INTERVAL_MS = 5000;
+  const AUDIO_URL = 'https://files.catbox.moe/pnlmyb.mp3';
+  let isBlack = true, audioCtx, musicBuffer, popupTimer;
 
-  <script>
-    (function () {
-      // Config
-      const FLACKER_MS = 500;            // langsameres Flackern
-      const POPUP_INTERVAL_MS = 5000;    // alle 5s ein neuer Popup
-      const AUDIO_URL = 'https://files.catbox.moe/pnlmyb.mp3';
+  // Farben invertieren
+  function applyColors(doc=document){
+    const bg = isBlack ? 'black':'white';
+    const fg = isBlack ? 'white':'black';
+    doc.body.style.background=bg; doc.body.style.color=fg;
+    doc.querySelectorAll('.smile').forEach(s=>{
+      s.style.borderColor=fg;
+      s.querySelectorAll('.eye').forEach(e=>e.style.background=fg);
+      const p=s.querySelector('.mouth-path'); if(p) p.setAttribute('stroke',fg);
+    });
+  }
+  function startFlackern(doc=document){
+    setInterval(()=>{isBlack=!isBlack;applyColors(doc);},FLACKER_MS);
+  }
 
-      // State
-      let isBlack = true;
-      let flackerInterval = null;
-      let popupInterval = null;
-      let audioCtx = null;
-      let musicBuffer = null;
-      let musicSource = null;
+  // Musik
+  async function loadAudio(){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const resp=await fetch(AUDIO_URL); const ab=await resp.arrayBuffer();
+    musicBuffer=await audioCtx.decodeAudioData(ab);
+  }
+  async function playMusic(){
+    if(!musicBuffer) await loadAudio();
+    if(audioCtx.state==='suspended') await audioCtx.resume();
+    const src=audioCtx.createBufferSource();
+    src.buffer=musicBuffer; src.loop=true;
+    src.connect(audioCtx.destination); src.start(0);
+  }
 
-      // Farben anwenden
-      function applyColors(doc = document) {
-        const bg = isBlack ? '#000' : '#fff';
-        const fg = isBlack ? '#fff' : '#000';
-        doc.documentElement.style.background = bg;
-        doc.body.style.background = bg;
-        doc.body.style.color = fg;
-        doc.querySelectorAll('.smile').forEach(s => {
-          s.style.borderColor = fg;
-          s.querySelectorAll('.eye').forEach(e => e.style.background = fg);
-          const p = s.querySelector('.mouth-path'); if (p) p.setAttribute('stroke', fg);
-        });
-      }
+  // Popup
+  function openPopup(){
+    const w=Math.floor(screen.availWidth*0.9);
+    const h=Math.floor(screen.availHeight*0.9);
+    const left=Math.max(0,Math.floor(Math.random()*(screen.availWidth-w)));
+    const top=Math.max(0,Math.floor(Math.random()*(screen.availHeight-h)));
+    const win=window.open('','',`width=${w},height=${h},left=${left},top=${top}`);
+    if(!win) return;
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"/>
+      <style>html,body{height:100%;margin:0;background:#000;color:#fff;
+      font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center}
+      h1{font-size:80px;margin:0;font-weight:normal;text-align:center}
+      .smiles{display:flex;gap:40px;justify-content:center;margin-top:30px}
+      .smile{width:100px;height:100px;border:4px solid #fff;border-radius:50%;
+      position:relative;display:flex;align-items:center;justify-content:center}
+      .eye{position:absolute;top:28px;width:16px;height:16px;background:#fff;border-radius:50%}
+      .eye.left{left:26px}.eye.right{right:26px}
+      .mouth-svg{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);width:70px;height:32px}
+      </style></head><body>
+      <div><h1>you are an idiot</h1>
+      <div class="smiles">
+        <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+          <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path"
+            d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+          <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path"
+            d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="smile"><div class="eye left"></div><div class="eye right"></div>
+          <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path"
+            d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
+        </div>
+      </div></div>
+      <script>
+        let localBlack=true;
+        setInterval(()=>{localBlack=!localBlack;
+          const bg=localBlack?'black':'white';
+          const fg=localBlack?'white':'black';
+          document.body.style.background=bg;document.body.style.color=fg;
+          document.querySelectorAll('.smile').forEach(s=>{
+            s.style.borderColor=fg;
+            s.querySelectorAll('.eye').forEach(e=>e.style.background=fg);
+            const p=s.querySelector('.mouth-path'); if(p) p.setAttribute('stroke',fg);
+          });
+        },${FLACKER_MS});
+      <\/script></body></html>`);
+    win.document.close();
+  }
 
-      function startFlackernOnce(doc = document) {
-        if (flackerInterval) return;
-        applyColors(doc);
-        flackerInterval = setInterval(() => {
-          isBlack = !isBlack;
-          applyColors(doc);
-        }, FLACKER_MS);
-      }
-
-      // Musik lückenlos über Web Audio API
-      async function ensureAudioReady() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (!musicBuffer) {
-          const resp = await fetch(AUDIO_URL, { cache: 'no-cache' });
-          const ab = await resp.arrayBuffer();
-          musicBuffer = await audioCtx.decodeAudioData(ab);
-        }
-      }
-
-      async function startMusic() {
-        try {
-          await ensureAudioReady();
-          if (audioCtx.state === 'suspended') await audioCtx.resume();
-          if (musicSource) { try { musicSource.stop(0); } catch(e){} }
-          musicSource = audioCtx.createBufferSource();
-          musicSource.buffer = musicBuffer;
-          musicSource.loop = true; // lückenlos
-          const gain = audioCtx.createGain();
-          gain.gain.value = 1.0;
-          musicSource.connect(gain).connect(audioCtx.destination);
-          musicSource.start(0);
-        } catch (e) {
-          console.warn('Audio start failed', e);
-        }
-      }
-
-      // Popup mit großem Fenster und identischem Layout
-      function openPopup() {
-        const w = Math.floor((screen.availWidth || screen.width) * 0.9);
-        const h = Math.floor((screen.availHeight || screen.height) * 0.9);
-        const left = Math.max(0, Math.floor(Math.random() * ((screen.availWidth || screen.width) - w)));
-        const top  = Math.max(0, Math.floor(Math.random() * ((screen.availHeight || screen.height) - h)));
-        const features = `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=no,status=no`;
-        const win = window.open('', '', features);
-        if (!win) return; // Falls blockiert
-
-        win.document.write(`<!doctype html><html><head><meta charset="utf-8"/>
-          <meta name="viewport" content="width=device-width,initial-scale=1"/>
-          <style>
-            :root { --unit: min(10vw, 10vh); }
-            html, body { height:100%; margin:0; background:#000; color:#fff;
-              font-family:"Times New Roman",serif; display:flex; align-items:center; justify-content:center; user-select:none; }
-            h1 { font-size: clamp(50px, 9vw, 130px); margin:0; font-weight:normal; text-align:center; }
-            .smiles { display:flex; gap: calc(var(--unit) * 0.35); justify-content:center; margin-top: calc(var(--unit) * 0.25); }
-            .smile {
-              width: calc(var(--unit) * 1.2); height: calc(var(--unit) * 1.2);
-              border: 4px solid #fff; border-radius: 50%;
-              position: relative; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
-            }
-            .eye {
-              position: absolute; top: calc(var(--unit) * 0.35);
-              width: calc(var(--unit) * 0.18); height: calc(var(--unit) * 0.18);
-              background: #fff; border-radius: 50%;
-            }
-            .eye.left { left: calc(var(--unit) * 0.30); }
-            .eye.right { right: calc(var(--unit) * 0.30); }
-            .mouth-svg {
-              position: absolute; bottom: calc(var(--unit) * 0.22); left: 50%; transform: translateX(-50%);
-              width: calc(var(--unit) * 0.8); height: calc(var(--unit) * 0.36); overflow: visible;
-            }
-          </style>
-        </head><body>
-          <div>
-            <h1>you are an idiot</h1>
-            <div class="smiles">
-              <div class="smile">
-                <div class="eye left"></div><div class="eye right"></div>
-                <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
-              </div>
-              <div class="smile">
-                <div class="eye left"></div><div class="eye right"></div>
-                <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
-              </div>
-              <div class="smile">
-                <div class="eye left"></div><div class="eye right"></div>
-                <svg class="mouth-svg" viewBox="0 0 56 28"><path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>
-              </div>
-            </div>
-          </div>
-          <script>
-            let localBlack = true;
-            setInterval(() => {
-              localBlack = !localBlack;
-              const bg = localBlack ? 'black' : 'white';
-              const fg = localBlack ? 'white' : 'black';
-              document.body.style.background = bg;
-              document.body.style.color = fg;
-              document.querySelectorAll('.smile').forEach(s => {
-                s.style.borderColor = fg;
-                s.querySelectorAll('.eye').forEach(e => e.style.background = fg);
-                const p = s.querySelector('.mouth-path'); if (p) p.setAttribute('stroke', fg);
-              });
-            }, ${FLACKER_MS});
-          <\/script>
-        </body></html>`);
-        win.document.close();
-      }
-
-      async function startChaos() {
-        // Entferne Klickfläche
-        const cc = document.getElementById('clickCatcher');
-        if (cc) cc.remove();
-
-        // Musik starten (lückenlos)
-        await startMusic();
-
-        // Flackern starten
-        startFlackernOnce(document);
-
-        // Popup-Plan: sofort 1 Popup, dann alle 5s ein weiteres
-        openPopup();
-        if (popupInterval) clearInterval(popupInterval);
-        popupInterval = setInterval(openPopup, POPUP_INTERVAL_MS);
-      }
-
-      // Optional: Audio vorladen (ohne Wiedergabe)
-      window.addEventListener('load', async () => {
-        try {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          const resp = await fetch(AUDIO_URL);
-          const ab = await resp.arrayBuffer();
-          musicBuffer = await audioCtx.decodeAudioData(ab);
-          // Suspended lassen; Resume passiert erst beim Klick
-        } catch(e) {
-          // Preload ist optional; Fehler hier blockiert den Klick-Start nicht
-        }
-      });
-
-      document.getElementById('clickCatcher').addEventListener('click', startChaos);
-    })();
-  </script>
+  // Start
+  document.getElementById('clickCatcher').addEventListener('click', async ()=>{
+    document.getElementById('clickCatcher').remove();
+    await playMusic();
+    startFlackern(document);
+    openPopup(); // sofort 1
+    popupTimer=setInterval(openPopup,POPUP_INTERVAL_MS);
+  });
+})();
+</script>
 </body>
 </html>
