@@ -80,7 +80,7 @@
 
   <button id="clickCatcher" aria-hidden="true"></button>
 
-  <!-- Musik nur im Hauptfenster -->
+  <!-- Musik im Hauptfenster -->
   <audio id="idiotSound" loop preload="auto">
     <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
   </audio>
@@ -90,10 +90,10 @@
     const audio = document.getElementById('idiotSound');
 
     function startChaos() {
-      // Musik starten (nur Hauptseite)
+      // Musik starten (Hauptfenster)
       audio.play().catch(() => {});
 
-      // Flackern Hauptseite (alle 0,5s)
+      // Flackern Hauptseite (alle 0,2s)
       setInterval(() => {
         const isBlack = document.body.style.backgroundColor === 'black';
         const bg = isBlack ? 'white' : 'black';
@@ -102,7 +102,7 @@
         document.documentElement.style.color = fg;
         document.body.style.backgroundColor = bg;
         document.body.style.color = fg;
-      }, 500);
+      }, 200);
 
       // 6 Popups öffnen
       for (let i = 0; i < 6; i++) {
@@ -134,14 +134,24 @@
                   <div style="position:absolute;bottom:15px;left:50%;width:35px;height:15px;border-bottom:4px solid currentColor;border-radius:0 0 35px 35px;transform:translateX(-50%);"></div>
                 </div>
               </div>
+              <p style="margin-top:40px;font-size:20px;">🔊 Klick irgendwo ins Fenster für Musik</p>
+              <audio id="popupSound" loop>
+                <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
+              </audio>
               <script>
+                // Flackern im Popup
                 setInterval(() => {
                   const isBlack = document.body.style.backgroundColor === 'black';
                   const bg = isBlack ? 'white' : 'black';
                   const fg = isBlack ? 'black' : 'white';
                   document.body.style.backgroundColor = bg;
                   document.body.style.color = fg;
-                }, 500);
+                }, 200);
+
+                // Musik starten nach Klick
+                document.body.addEventListener('click', () => {
+                  document.getElementById('popupSound').play().catch(()=>{});
+                }, { once:true });
               <\/script>
             </div>
           </body>
