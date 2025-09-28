@@ -1,140 +1,225 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <title>YOU ARE AN IDIOT ☻</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <title>YOU ARE AN IDIOT</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
+    html,body{height:100%;margin:0;}
+    body{
       background: black;
       color: white;
       font-family: monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background 0.1s linear;
-      user-select: none;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      transition: background 0.08s linear,color 0.08s linear;
+      user-select:none;
+      -webkit-user-select:none;
     }
-    h1 {
-      font-size: 48px;
+    h1{font-size:clamp(28px,6vw,64px);margin:0;}
+    /* unsichtbarer Vollbild-Klickfänger */
+    #clickCatcher{
+      position:fixed;
+      inset:0;
+      background:transparent;
+      border:0;
+      padding:0;
+      margin:0;
+      cursor:default;
+      z-index:999;
     }
-    #clickCatcher {
-      position: fixed;
-      inset: 0;
-      background: transparent;
-      border: none;
-      cursor: default;
-    }
-    #stopOverlay {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: rgba(0,0,0,0.6);
-      color: white;
-      border: 1px solid white;
-      padding: 6px 12px;
-      font-size: 14px;
-      font-family: monospace;
-      display: none;
-      cursor: pointer;
-      z-index: 9999;
+    /* sichtbare STOP-Schaltfläche (erst nach Aktivierung) */
+    #stopOverlay{
+      position:fixed;
+      top:10px;
+      right:10px;
+      background:rgba(0,0,0,0.6);
+      color:white;
+      border:1px solid white;
+      padding:6px 10px;
+      font-family:monospace;
+      font-size:14px;
+      display:none;
+      cursor:pointer;
+      z-index:1000;
     }
   </style>
 </head>
 <body>
   <h1>YOU ARE AN IDIOT ☻</h1>
+
+  <!-- unsichtbar und fullscreen zum ersten Klick -->
   <button id="clickCatcher" aria-hidden="true"></button>
+
   <div id="stopOverlay">STOP (Esc)</div>
 
-  <audio id="idiotSound" loop preload="auto">
-    <source src="https://ia800304.us.archive.org/27/items/youareanidiotdotorgflash/youareanidiot.mp3" type="audio/mpeg">
-  </audio>
-
   <script>
-    const audio = document.getElementById('idiotSound');
-    const clickCatcher = document.getElementById('clickCatcher');
-    const stopOverlay = document.getElementById('stopOverlay');
+    (function(){
+      const clickCatcher = document.getElementById('clickCatcher');
+      const stopOverlay = document.getElementById('stopOverlay');
 
-    let active = false;
-    let flasher = null;
-    let popupTimer = null;
-    const openPopups = new Set();
+      let active = false;
+      let flasher = null;
+      let popupTimer = null;
+      const openPopups = new Set();
 
-    function startIdiotMode() {
-      if (active) return;
-      active = true;
-      stopOverlay.style.display = 'inline-block';
+      // WebAudio setup (erzeugt verlässlichen Sound nach Benutzeraktion)
+      let audioCtx = null;
+      let masterGain = null;
+      let oscillator = null;
 
-      // Musik starten
-      audio.play().catch(() => {});
+      function startSound() {
+        try {
+          if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.12; // Lautstärke anpassen
+            masterGain.connect(audioCtx.destination);
 
-      // Flacker-Effekt: Schwarz ↔ Weiß
-      flasher = setInterval(() => {
-        document.body.style.backgroundColor =
-          document.body.style.backgroundColor === 'black' ? 'white' : 'black';
-        document.body.style.color =
-          document.body.style.color === 'white' ? 'black' : 'white';
-      }, 180);
+            // create a layered sound (two oscillators detuned) für "lauteren" Effekt
+            oscillator = audioCtx.createOscillator();
+            oscillator.type = 'square';
+            oscillator.frequency.value = 220; // A3-ish
+            const osc2 = audioCtx.createOscillator();
+            osc2.type = 'sawtooth';
+            osc2.frequency.value = 440;
+            const g2 = audioCtx.createGain();
+            g2.gain.value = 0.06;
 
-      // Popups starten
-      let count = 1;
-      for (let i = 0; i < 5; i++) {
-        setTimeout(() => openPopup(count++), i * 300);
-      }
-      popupTimer = setInterval(() => openPopup(count++), 1500);
-    }
+            oscillator.connect(masterGain);
+            osc2.connect(g2);
+            g2.connect(masterGain);
 
-    function openPopup(id) {
-      const win = window.open("", "", "width=400,height=300,left=" + (Math.random()*200) + ",top=" + (Math.random()*200));
-      if (win) {
-        win.document.write(`
-          <body style="background:black;color:white;font-family:monospace;text-align:center;margin-top:60px;">
-            <h1>YOU ARE AN IDIOT ☻</h1>
-            <p>Popup #${id}</p>
-          </body>
-        `);
-        openPopups.add(win);
-        const checker = setInterval(() => {
-          if (win.closed) {
-            clearInterval(checker);
-            openPopups.delete(win);
+            oscillator.start();
+            osc2.start();
+
+            // leichte LFO auf Lautstärke für Variation
+            const lfo = audioCtx.createOscillator();
+            lfo.frequency.value = 2.5;
+            const lfoGain = audioCtx.createGain();
+            lfoGain.gain.value = 0.04;
+            lfo.connect(lfoGain);
+            lfoGain.connect(masterGain.gain);
+            lfo.start();
+
+            // sichere Referenzen für Stop
+            audioCtx._oscillators = [oscillator, osc2, lfo];
+            audioCtx._gains = [masterGain, g2, lfoGain];
+          } else {
+            // Falls bereits existiert, nur Resume
+            if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
           }
-        }, 1000);
+        } catch(e){
+          // stille Fehler ignorieren
+        }
       }
-    }
 
-    function stopIdiotMode() {
-      if (!active) return;
-      active = false;
-      stopOverlay.style.display = 'none';
+      function stopSound(){
+        try {
+          if (audioCtx) {
+            // stop oscillators and close context
+            (audioCtx._oscillators || []).forEach(o => {
+              try { o.stop(); } catch(e){}
+            });
+            try { audioCtx.close(); } catch(e){}
+            audioCtx = null;
+          }
+        } catch(e){}
+      }
 
-      // Musik stoppen
-      audio.pause();
-      audio.currentTime = 0;
+      // Popup-HTML (lokal, kein Redirect)
+      function popupHtml(id){
+        return `<!doctype html><html><head><meta charset="utf-8"><title>YOU ARE AN IDIOT</title>
+          <style>body{background:black;color:white;font-family:monospace;text-align:center;margin-top:60px;}h1{font-size:28px}</style>
+          </head><body><h1>YOU ARE AN IDIOT ☻</h1><p>Popup #${id}</p></body></html>`;
+      }
 
-      // Flacker stoppen
-      clearInterval(flasher);
-      document.body.style.backgroundColor = 'black';
-      document.body.style.color = 'white';
+      // öffnet ein Popup und füllt Inhalt
+      function openPopup(id){
+        const left = Math.floor(Math.random()*300)+20;
+        const top = Math.floor(Math.random()*200)+20;
+        const specs = `width=420,height=300,left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`;
+        const win = window.open('about:blank','_blank',specs);
+        if (!win) return null;
+        try {
+          win.document.open();
+          win.document.write(popupHtml(id));
+          win.document.close();
+        } catch(e){
+          // manche Browser schränken write ein, ignore
+        }
+        openPopups.add(win);
+        // beobachten, damit Referenzen entfernt werden
+        const t = setInterval(()=>{ if (win.closed){ clearInterval(t); openPopups.delete(win); } }, 800);
+        return win;
+      }
 
-      // Popups schließen
-      clearInterval(popupTimer);
-      openPopups.forEach(win => {
-        try { if (!win.closed) win.close(); } catch(e) {}
+      function startChaos(){
+        if (active) return;
+        active = true;
+        stopOverlay.style.display = 'inline-block';
+
+        // Sound starten (WebAudio, zuverlässig nach Klick)
+        startSound();
+
+        // Schwarz/Weiß-Flackern strikt
+        flasher = setInterval(()=>{
+          const bg = document.body.style.backgroundColor === 'black' ? 'white' : 'black';
+          const fg = bg === 'black' ? 'white' : 'black';
+          document.body.style.backgroundColor = bg;
+          document.body.style.color = fg;
+        }, 160);
+
+        // initiale Popups
+        let id = 1;
+        for (let i=0;i<6;i++){
+          setTimeout(()=>openPopup(id++), i*220);
+        }
+        popupTimer = setInterval(()=>openPopup(id++), 1200);
+      }
+
+      function stopChaos(){
+        if (!active) return;
+        active = false;
+        stopOverlay.style.display = 'none';
+
+        // Stop Sound
+        stopSound();
+
+        // Stop flasher
+        if (flasher) { clearInterval(flasher); flasher = null; }
+        document.body.style.backgroundColor = 'black';
+        document.body.style.color = 'white';
+
+        // Stop popups and close all
+        if (popupTimer) { clearInterval(popupTimer); popupTimer = null; }
+        openPopups.forEach(w => {
+          try { if (!w.closed) w.close(); } catch(e){}
+        });
+        openPopups.clear();
+      }
+
+      // unsichtbarer Klickfanger: einmaliger Klick startet alles
+      clickCatcher.addEventListener('click', (ev)=>{
+        ev.preventDefault();
+        startChaos();
+      }, { once: true });
+
+      // Stopper klickbar
+      stopOverlay.addEventListener('click', stopChaos);
+
+      // Esc als Stop
+      document.addEventListener('keydown', ev => { if (ev.key === 'Escape') stopChaos(); });
+
+      // extra: jeder weitere Klick versucht zu resume audio (sicherer)
+      document.addEventListener('click', ()=>{ if (active && audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{}); });
+
+      // Aufräumen beim Verlassen
+      window.addEventListener('beforeunload', ()=> {
+        openPopups.forEach(w=>{ try { if (!w.closed) w.close(); } catch(e){} });
       });
-      openPopups.clear();
-    }
-
-    clickCatcher.addEventListener('click', startIdiotMode, { once: true });
-    stopOverlay.addEventListener('click', stopIdiotMode);
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') stopIdiotMode();
-    });
-    document.addEventListener('click', () => {
-      if (active) audio.play().catch(() => {});
-    });
+    })();
   </script>
 </body>
 </html>
