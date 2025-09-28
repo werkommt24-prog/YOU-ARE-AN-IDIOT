@@ -2,196 +2,139 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>YOU ARE AN IDIOT</title>
+  <title>YOU ARE AN IDIOT ☻</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    :root{
-      --bg1: black;
-      --bg2: red;
-      --fg: #a6ff00;
-      --mono: "Courier New", monospace;
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+      color: white;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.1s linear;
+      user-select: none;
     }
-    html,body{height:100%;margin:0;}
-    body{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:var(--bg1);
-      color:var(--fg);
-      font-family:var(--mono);
-      text-align:center;
-      transition: background .08s linear;
-      user-select:none;
-      -webkit-user-select:none;
+    h1 {
+      font-size: 48px;
     }
-    h1{font-size:clamp(28px,6vw,64px); margin:0 20px;}
-    /* versteckter Click-Catcher (unsichtbar, damit keine sichtbarer Button erscheint) */
-    #clickCatcher{
-      position:fixed;
-      inset:0;
-      background:transparent;
-      border:0;
-      padding:0;
-      margin:0;
-      cursor:default;
+    #clickCatcher {
+      position: fixed;
+      inset: 0;
+      background: transparent;
+      border: none;
+      cursor: default;
     }
-    /* kleine Statusanzeige (unsichtbar, kann zum Debug sichtbar gemacht werden) */
-    #status{position:fixed;left:8px;bottom:8px;font-size:12px;opacity:.0;}
-    /* STOP-Overlay erscheint wenn aktiv, klickbar */
-    #stopOverlay{
-      position:fixed;
-      top:8px; right:8px;
-      background:rgba(0,0,0,0.6);
-      color:var(--fg);
-      border:1px solid rgba(166,255,0,0.2);
-      padding:6px 10px;
-      font-family:var(--mono);
-      font-size:14px;
-      display:none;
-      cursor:pointer;
-      z-index:9999;
+    #stopOverlay {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: 1px solid white;
+      padding: 6px 12px;
+      font-size: 14px;
+      font-family: monospace;
+      display: none;
+      cursor: pointer;
+      z-index: 9999;
     }
   </style>
 </head>
 <body>
   <h1>YOU ARE AN IDIOT ☻</h1>
-
-  <!-- unsichtbarer Volldeckender Bereich: erster Klick aktiviert alles (wegen Browser-Sicherheitsregeln) -->
   <button id="clickCatcher" aria-hidden="true"></button>
+  <div id="stopOverlay">STOP (Esc)</div>
 
-  <!-- STOP-Overlay, sichtbar nach Aktivierung -->
-  <div id="stopOverlay" role="button" aria-label="Stoppe Alles">STOP (Esc)</div>
-
-  <!-- Status (für Debug unsichtbar) -->
-  <div id="status">idle</div>
-
-  <!-- Audio: externe Datei; wenn Link ausfällt, ersetze durch eigene Datei im Repo -->
-  <audio id="idiotAudio" loop preload="auto">
+  <audio id="idiotSound" loop preload="auto">
     <source src="https://ia800304.us.archive.org/27/items/youareanidiotdotorgflash/youareanidiot.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    (function(){
-      const audio = document.getElementById('idiotAudio');
-      const clickCatcher = document.getElementById('clickCatcher');
-      const stopOverlay = document.getElementById('stopOverlay');
-      const status = document.getElementById('status');
+    const audio = document.getElementById('idiotSound');
+    const clickCatcher = document.getElementById('clickCatcher');
+    const stopOverlay = document.getElementById('stopOverlay');
 
-      let active = false;
-      let flasher = null;
-      let popupTimer = null;
-      const openPopups = new Set();
+    let active = false;
+    let flasher = null;
+    let popupTimer = null;
+    const openPopups = new Set();
 
-      // sichere Popup-Inhalte (keine externe URLs)
-      function makePopupContent(id){
-        return `
-          <!doctype html>
-          <html><head><meta charset="utf-8"><title>YOU ARE AN IDIOT</title>
-          <style>body{background:black;color:#a6ff00;font-family:monospace;text-align:center;margin:60px;}h1{font-size:28px}</style>
-          </head><body>
-          <h1>YOU ARE AN IDIOT ☻</h1>
-          <p>Popup #${id}</p>
-          </body></html>
-        `;
+    function startIdiotMode() {
+      if (active) return;
+      active = true;
+      stopOverlay.style.display = 'inline-block';
+
+      // Musik starten
+      audio.play().catch(() => {});
+
+      // Flacker-Effekt: Schwarz ↔ Weiß
+      flasher = setInterval(() => {
+        document.body.style.backgroundColor =
+          document.body.style.backgroundColor === 'black' ? 'white' : 'black';
+        document.body.style.color =
+          document.body.style.color === 'white' ? 'black' : 'white';
+      }, 180);
+
+      // Popups starten
+      let count = 1;
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => openPopup(count++), i * 300);
       }
+      popupTimer = setInterval(() => openPopup(count++), 1500);
+    }
 
-      // Popup öffnen (about:blank und eigenem HTML füllen)
-      function openPopup(id, w=420, h=320){
-        const specs = `width=${w},height=${h},left=${Math.floor(Math.random()*200)},top=${Math.floor(Math.random()*200)}`;
-        const win = window.open('about:blank', '_blank', specs);
-        if (!win) return null;
-        try {
-          win.document.open();
-          win.document.write(makePopupContent(id));
-          win.document.close();
-        } catch(e){
-          // manche Browser schränken das Schreiben ein; ignore
-        }
+    function openPopup(id) {
+      const win = window.open("", "", "width=400,height=300,left=" + (Math.random()*200) + ",top=" + (Math.random()*200));
+      if (win) {
+        win.document.write(`
+          <body style="background:black;color:white;font-family:monospace;text-align:center;margin-top:60px;">
+            <h1>YOU ARE AN IDIOT ☻</h1>
+            <p>Popup #${id}</p>
+          </body>
+        `);
         openPopups.add(win);
-        // entferne Referenz beim Close
-        const timer = setInterval(()=>{ if (win.closed){ clearInterval(timer); openPopups.delete(win); } }, 1000);
-        return win;
+        const checker = setInterval(() => {
+          if (win.closed) {
+            clearInterval(checker);
+            openPopups.delete(win);
+          }
+        }, 1000);
       }
+    }
 
-      // Startmodus: Musik, Flackern, Popups
-      function startChaos(){
-        if (active) return;
-        active = true;
-        status.textContent = 'aktiv';
-        stopOverlay.style.display = 'inline-block';
+    function stopIdiotMode() {
+      if (!active) return;
+      active = false;
+      stopOverlay.style.display = 'none';
 
-        // Musik starten (Play-Promise behandeln)
-        const p = audio.play();
-        if (p !== undefined) {
-          p.catch(()=>{/* Autoplay-block, bleibt stumm bis weitere Interaktion */});
-        }
+      // Musik stoppen
+      audio.pause();
+      audio.currentTime = 0;
 
-        // Flacker-Effekt: schneller Wechsel zwischen zwei Farben
-        flasher = setInterval(()=>{
-          document.body.style.backgroundColor = document.body.style.backgroundColor === 'black' ? 'red' : 'black';
-        }, 180);
+      // Flacker stoppen
+      clearInterval(flasher);
+      document.body.style.backgroundColor = 'black';
+      document.body.style.color = 'white';
 
-        // Popups: öffne initial viele und dann regelmäßig
-        let idCounter = 1;
-        for (let i=0;i<6;i++){
-          setTimeout(()=>openPopup(idCounter++), i*250);
-        }
-        popupTimer = setInterval(()=>openPopup(idCounter++), 1400);
-      }
-
-      // Stop-Modus: alles schließen
-      function stopChaos(){
-        if (!active) return;
-        active = false;
-        status.textContent = 'gestoppt';
-        stopOverlay.style.display = 'none';
-
-        // stop audio
-        try { audio.pause(); audio.currentTime = 0; } catch(e){}
-
-        // stop flasher
-        if (flasher) { clearInterval(flasher); flasher = null; }
-        document.body.style.backgroundColor = 'black';
-
-        // stop popup timer and close all popups
-        if (popupTimer) { clearInterval(popupTimer); popupTimer = null; }
-        openPopups.forEach(win => {
-          try { if (!win.closed) win.close(); } catch(e){}
-        });
-        openPopups.clear();
-      }
-
-      // erster Klick aktiviert (unsichtbar)
-      clickCatcher.addEventListener('click', (e)=>{
-        // verhindere dass Klick die Seite weg navigiert, nur aktivieren
-        e.preventDefault();
-        startChaos();
-      }, { once: true });
-
-      // STOP-Overlay klickbar
-      stopOverlay.addEventListener('click', stopChaos);
-
-      // Esc als Stop
-      document.addEventListener('keydown', (ev)=>{
-        if (ev.key === 'Escape') stopChaos();
+      // Popups schließen
+      clearInterval(popupTimer);
+      openPopups.forEach(win => {
+        try { if (!win.closed) win.close(); } catch(e) {}
       });
+      openPopups.clear();
+    }
 
-      // Fallback: wenn irgendein weiterer Klick nach Start nötig ist, resume audio
-      document.addEventListener('click', ()=>{
-        if (active){
-          const p = audio.play();
-          if (p !== undefined) p.catch(()=>{});
-        }
-      });
-
-      // Sauber aufräumen beim Verlassen
-      window.addEventListener('beforeunload', ()=> {
-        openPopups.forEach(win=>{ try { if (!win.closed) win.close(); } catch(e){} });
-      });
-
-      // Debug: sichtbar machen beim Entwickeln
-      // status.style.opacity = 1;
-    })();
+    clickCatcher.addEventListener('click', startIdiotMode, { once: true });
+    stopOverlay.addEventListener('click', stopIdiotMode);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') stopIdiotMode();
+    });
+    document.addEventListener('click', () => {
+      if (active) audio.play().catch(() => {});
+    });
   </script>
 </body>
 </html>
