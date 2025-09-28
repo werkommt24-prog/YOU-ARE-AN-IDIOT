@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YOU ARE AN IDIOT ☻</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      background-color: black;
+      color: lime;
+      font-family: monospace;
+      text-align: center;
+      margin-top: 100px;
+      transition: background-color 0.1s;
+    }
+    h1 {
+      font-size: 48px;
+    }
+  </style>
+</head>
+<body>
+  <h1>YOU ARE AN IDIOT ☻☻☻</h1>
+
+  <audio id="idiotSound" loop>
+    <source src="https://ia800304.us.archive.org/27/items/youareanidiotdotorgflash/youareanidiot.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    let activated = false;
+
+    function startIdiotMode() {
+      if (activated) return;
+      activated = true;
+
+      // Musik starten
+      const sound = document.getElementById("idiotSound");
+      sound.play();
+
+      // Flacker-Effekt
+      setInterval(() => {
+        document.body.style.backgroundColor =
+          document.body.style.backgroundColor === "black" ? "red" : "black";
+      }, 200);
+
+      // Echte Popup-Fenster mit eigenem Inhalt
+      setInterval(() => {
+        const popup = window.open("", "", "width=400,height=400");
+        if (popup) {
+          popup.document.write(`
+            <body style="background-color:black;color:lime;font-family:monospace;text-align:center;margin-top:100px;">
+              <h1>YOU ARE AN IDIOT ☻</h1>
+            </body>
+          `);
+        }
+      }, 1500);
+    }
+
+    // Aktivierung durch Klick irgendwo
+    document.body.addEventListener("click", startIdiotMode);
+  </script>
+</body>
+</html>
