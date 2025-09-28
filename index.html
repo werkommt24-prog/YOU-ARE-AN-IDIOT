@@ -10,10 +10,9 @@
       font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center;user-select:none;}
     h1{font-size:84px;margin:0;font-weight:normal;text-align:center;}
     .smiles{display:flex;gap:36px;justify-content:center;margin-top:28px;}
-    .smile{width:80px;height:80px;border:4px solid var(--fg-white);border-radius:50%;position:relative;box-sizing:border-box;
-      display:flex;align-items:center;justify-content:center;background:transparent;}
+    .smile{width:80px;height:80px;border:4px solid var(--fg-white);border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box;background:transparent;}
     .eye{position:absolute;top:26px;width:10px;height:10px;background:var(--fg-white);border-radius:50%;}
-    .eye.left{left:20px} .eye.right{right:20px}
+    .eye.left{left:20px}.eye.right{right:20px}
     .mouth-svg{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:56px;height:28px;overflow:visible;}
     .invert{border-color:var(--fg-black) !important;}
     .invert .eye{background:var(--fg-black) !important;}
@@ -32,7 +31,6 @@
           <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
         </svg>
       </div>
-
       <div class="smile">
         <div class="eye left"></div>
         <div class="eye right"></div>
@@ -40,7 +38,6 @@
           <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="white" stroke-width="4" stroke-linecap="round"/>
         </svg>
       </div>
-
       <div class="smile">
         <div class="eye left"></div>
         <div class="eye right"></div>
@@ -63,39 +60,28 @@
       const audio = document.getElementById('idiotSound');
       let flackerIntervalId = null;
       const FLACKER_MS = 400;
+      let isBlack = true;
 
-      function setColors(isBlack) {
-        const bg = isBlack ? '#000' : '#fff';
-        const fg = isBlack ? '#fff' : '#000';
+      function applyColors(bgIsBlack){
+        const bg = bgIsBlack ? '#000' : '#fff';
+        const fg = bgIsBlack ? '#fff' : '#000';
         document.documentElement.style.background = bg;
         document.body.style.background = bg;
         document.body.style.color = fg;
-
         document.querySelectorAll('.smile').forEach(s=>{
-          const eyes = s.querySelectorAll('.eye');
-          const mouthPath = s.querySelector('.mouth-path');
-          if (!eyes.length || !mouthPath) return;
-          if (bg === '#fff') {
-            s.classList.add('invert');
-            eyes.forEach(e=>e.style.background = '#000');
-            mouthPath.setAttribute('stroke','#000');
-            s.style.borderColor = '#000';
-          } else {
-            s.classList.remove('invert');
-            eyes.forEach(e=>e.style.background = '#fff');
-            mouthPath.setAttribute('stroke','#fff');
-            s.style.borderColor = '#fff';
-          }
+          s.style.borderColor = fg;
+          s.querySelectorAll('.eye').forEach(e=> e.style.background = fg);
+          const p = s.querySelector('.mouth-path');
+          if (p) p.setAttribute('stroke', fg);
         });
       }
 
-      function startFlackern(){
+      function startFlackernOnce(){
         if (flackerIntervalId !== null) return;
-        let isBlack = true;
-        setColors(isBlack);
+        applyColors(isBlack);
         flackerIntervalId = setInterval(()=>{
           isBlack = !isBlack;
-          setColors(isBlack);
+          applyColors(isBlack);
         }, FLACKER_MS);
       }
 
@@ -107,10 +93,10 @@
           if (!win) continue;
           win.document.write(`<!doctype html><html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>you are an idiot</title>
             <style>
-              html,body{height:100%;margin:0;background:#000;color:#fff;font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center;}
+              html,body{height:100%;margin:0;background:#000;color:#fff;font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center;user-select:none;}
               h1{font-size:80px;margin:0;font-weight:normal;text-align:center}
               .smiles{display:flex;gap:36px;justify-content:center;margin-top:28px}
-              .smile{width:70px;height:70px;border:4px solid #fff;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center}
+              .smile{width:70px;height:70px;border:4px solid #fff;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
               .eye{position:absolute;top:20px;width:10px;height:10px;background:#fff;border-radius:50%}
               .eye.left{left:15px}.eye.right{right:15px}
               .mouth-svg{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:46px;height:24px}
@@ -123,13 +109,11 @@
                     <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
                   </svg>
                 </div>
-
                 <div class="smile"><div class="eye left"></div><div class="eye right"></div>
                   <svg class="mouth-svg" viewBox="0 0 56 28" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
                     <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
                   </svg>
                 </div>
-
                 <div class="smile"><div class="eye left"></div><div class="eye right"></div>
                   <svg class="mouth-svg" viewBox="0 0 56 28" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
                     <path class="mouth-path" d="M6,8 C16,22 40,22 50,8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
@@ -137,19 +121,18 @@
                 </div>
               </div>
             </div>
-
             <script>
-              let last = true;
+              let localIsBlack = true;
               const FL = ${FLACKER_MS};
               setInterval(()=>{
-                last = !last;
-                const bg = last ? 'black' : 'white';
-                const fg = last ? 'white' : 'black';
+                localIsBlack = !localIsBlack;
+                const bg = localIsBlack ? 'black' : 'white';
+                const fg = localIsBlack ? 'white' : 'black';
                 document.body.style.background = bg;
                 document.body.style.color = fg;
                 document.querySelectorAll('.smile').forEach(s=>{
                   s.style.borderColor = fg;
-                  s.querySelectorAll('.eye').forEach(e=>e.style.background = fg);
+                  s.querySelectorAll('.eye').forEach(e=> e.style.background = fg);
                   const p = s.querySelector('.mouth-path');
                   if(p) p.setAttribute('stroke', fg);
                 });
@@ -160,8 +143,8 @@
         }
       }
 
-      function startChaosOnce(){
-        startFlackern();
+      function startOnce(){
+        startFlackernOnce();
         audio.play().catch(()=>{});
         openPopups(6);
       }
@@ -169,7 +152,7 @@
       clickCatcher.addEventListener('click', function handler(){
         clickCatcher.removeEventListener('click', handler);
         clickCatcher.remove();
-        startChaosOnce();
+        startOnce();
       });
     })();
   </script>
