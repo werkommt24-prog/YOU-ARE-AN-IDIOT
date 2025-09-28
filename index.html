@@ -25,22 +25,37 @@
   </audio>
 
   <script>
-    // Flacker-Effekt
-    setInterval(() => {
-      document.body.style.backgroundColor =
-        document.body.style.backgroundColor === "black" ? "red" : "black";
-    }, 200);
+    let activated = false;
 
-    // Musik starten nach erstem Klick
-    const sound = document.getElementById("idiotSound");
-    document.body.addEventListener("click", () => {
+    function startIdiotMode() {
+      if (activated) return;
+      activated = true;
+
+      // Musik starten
+      const sound = document.getElementById("idiotSound");
       sound.play();
-    }, { once: true });
 
-    // Echte Popup-Fenster alle 2 Sekunden
-    setInterval(() => {
-      window.open("about:blank", "_blank", "width=400,height=400");
-    }, 2000);
+      // Flacker-Effekt
+      setInterval(() => {
+        document.body.style.backgroundColor =
+          document.body.style.backgroundColor === "black" ? "red" : "black";
+      }, 200);
+
+      // Echte Popup-Fenster
+      setInterval(() => {
+        const popup = window.open("", "", "width=400,height=400");
+        if (popup) {
+          popup.document.write(`
+            <body style="background-color:black;color:lime;font-family:monospace;text-align:center;margin-top:100px;">
+              <h1>YOU ARE AN IDIOT ☻</h1>
+            </body>
+          `);
+        }
+      }, 1500);
+    }
+
+    // Aktivierung durch Klick irgendwo
+    document.body.addEventListener("click", startIdiotMode);
   </script>
 </body>
 </html>
