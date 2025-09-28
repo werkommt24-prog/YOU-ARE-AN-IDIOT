@@ -1,79 +1,23 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>you are an idiot ☻☻☻</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      width: 100%;
-      background: black;
-      color: white;
-      font-family: "Times New Roman", serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      user-select: none;
-    }
-    h1 {
-      font-size: 100px;
-      margin: 0;
-      text-align: center;
-      font-weight: normal;
-    }
-    .smiles {
-      display: flex;
-      justify-content: center;
-      margin-top: 30px;
-      gap: 40px;
-    }
-    .smile {
-      width: 80px;
-      height: 80px;
-      border: 4px solid white;
-      border-radius: 50%;
-      position: relative;
-    }
-    .smile::before, .smile::after {
-      content: "";
-      position: absolute;
-      top: 25px;
-      width: 10px;
-      height: 10px;
-      background: white;
-      border-radius: 50%;
-    }
-    .smile::before { left: 20px; }
-    .smile::after { right: 20px; }
-    .mouth {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      width: 40px;
-      height: 20px;
-      border-bottom: 4px solid white;
-      border-radius: 0 0 40px 40px;
-      transform: translateX(-50%);
-    }
-    .invert {
-      border-color: black !important;
-    }
-    .invert::before, .invert::after {
-      background: black !important;
-    }
-    .invert .mouth {
-      border-bottom-color: black !important;
-    }
-    #clickCatcher {
-      position: fixed;
-      inset: 0;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      z-index: 999;
-    }
+    :root { --bg-black: #000; --bg-white: #fff; --fg-white: #fff; --fg-black: #000; }
+    html,body { height:100%; margin:0; background:var(--bg-black); color:var(--fg-white);
+      font-family:"Times New Roman", serif; display:flex; align-items:center; justify-content:center; user-select:none; }
+    h1 { font-size:84px; margin:0; font-weight:normal; text-align:center; }
+    .smiles { display:flex; gap:36px; justify-content:center; margin-top:28px; }
+    .smile { width:80px; height:80px; border:4px solid var(--fg-white); border-radius:50%; position:relative; box-sizing:border-box; }
+    .smile::before, .smile::after { content:""; position:absolute; top:26px; width:10px; height:10px; background:var(--fg-white); border-radius:50%; }
+    .smile::before { left:20px } .smile::after { right:20px }
+    .mouth { position:absolute; left:50%; bottom:18px; width:44px; height:20px; transform:translateX(-50%); border-bottom:4px solid var(--fg-white); border-radius:0 0 44px 44px; box-sizing:border-box; }
+    .invert { border-color:var(--fg-black) !important; }
+    .invert::before, .invert::after { background:var(--fg-black) !important; }
+    .invert .mouth { border-bottom-color:var(--fg-black) !important; }
+    #clickCatcher { position:fixed; inset:0; background:transparent; border:0; cursor:pointer; z-index:999; }
   </style>
 </head>
 <body>
@@ -86,89 +30,119 @@
     </div>
   </div>
 
-  <button id="clickCatcher" aria-hidden="true"></button>
+  <!-- unsichtbares Klickfeld; ein Klick startet alles (nur einmal) -->
+  <button id="clickCatcher" aria-hidden="true" title="Klick zum Start"></button>
 
+  <!-- Musik nur im Hauptfenster, aber nicht automatisch starten -->
   <audio id="idiotSound" loop preload="auto">
     <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    const clickCatcher = document.getElementById('clickCatcher');
-    const audio = document.getElementById('idiotSound');
+    (function () {
+      const clickCatcher = document.getElementById('clickCatcher');
+      const audio = document.getElementById('idiotSound');
+      let flackerIntervalId = null;
+      const FLACKER_MS = 400; // gewünschtes Tempo (ändere hier)
 
-    function startChaos() {
-      clickCatcher.remove();
-      audio.play().catch(() => {});
-
-      // Flackern Hauptseite (alle 400ms)
-      setInterval(() => {
-        const isBlack = document.body.style.backgroundColor === 'black';
-        const bg = isBlack ? 'white' : 'black';
-        const fg = isBlack ? 'black' : 'white';
-        document.body.style.backgroundColor = bg;
+      function setColors(bgIsBlack) {
+        const bg = bgIsBlack ? getComputedStyle(document.documentElement).getPropertyValue('--bg-black').trim() : getComputedStyle(document.documentElement).getPropertyValue('--bg-white').trim();
+        const fg = bgIsBlack ? getComputedStyle(document.documentElement).getPropertyValue('--fg-white').trim() : getComputedStyle(document.documentElement).getPropertyValue('--fg-black').trim();
+        document.documentElement.style.background = bg;
+        document.body.style.background = bg;
         document.body.style.color = fg;
 
         document.querySelectorAll('.smile').forEach(s => {
-          if (bg === 'white') {
-            s.classList.add('invert');
-          } else {
-            s.classList.remove('invert');
-          }
+          if (bg === '#fff' || bg.toLowerCase().includes('fff')) s.classList.add('invert');
+          else s.classList.remove('invert');
         });
-      }, 400);
-
-      // Popups öffnen
-      for (let i = 0; i < 6; i++) {
-        openPopup();
       }
-    }
 
-    function openPopup() {
-      const win = window.open("", "", "width=600,height=400,left=" + (Math.random()*300) + ",top=" + (Math.random()*200));
-      if (win) {
-        win.document.write(`
-          <body style="margin:0;height:100%;display:flex;align-items:center;justify-content:center;background:black;color:white;font-family:'Times New Roman',serif;">
-            <div style="text-align:center;">
-              <h1 style="font-size:80px;margin:0;font-weight:normal;">you are an idiot</h1>
-              <div class="smiles" style="display:flex;justify-content:center;gap:40px;margin-top:30px;">
-                <div class="smile" style="width:70px;height:70px;border:4px solid white;border-radius:50%;position:relative;">
-                  <div style="position:absolute;top:20px;left:15px;width:10px;height:10px;background:white;border-radius:50%;"></div>
-                  <div style="position:absolute;top:20px;right:15px;width:10px;height:10px;background:white;border-radius:50%;"></div>
-                  <div class="mouth" style="position:absolute;bottom:15px;left:50%;width:35px;height:15px;border-bottom:4px solid white;border-radius:0 0 35px 35px;transform:translateX(-50%);"></div>
-                </div>
-                <div class="smile" style="width:70px;height:70px;border:4px solid white;border-radius:50%;position:relative;">
-                  <div style="position:absolute;top:20px;left:15px;width:10px;height:10px;background:white;border-radius:50%;"></div>
-                  <div style="position:absolute;top:20px;right:15px;width:10px;height:10px;background:white;border-radius:50%;"></div>
-                  <div class="mouth" style="position:absolute;bottom:15px;left:50%;width:35px;height:15px;border-bottom:4px solid white;border-radius:0 0 35px 35px;transform:translateX(-50%);"></div>
-                </div>
-                <div class="smile" style="width:70px;height:70px;border:4px solid white;border-radius:50%;position:relative;">
-                  <div style="position:absolute;top:20px;left:15px;width:10px;height:10px;background:white;border-radius:50%;"></div>
-                  <div style="position:absolute;top:20px;right:15px;width:10px;height:10px;background:white;border-radius:50%;"></div>
-                  <div class="mouth" style="position:absolute;bottom:15px;left:50%;width:35px;height:15px;border-bottom:4px solid white;border-radius:0 0 35px 35px;transform:translateX(-50%);"></div>
-                </div>
-              </div>
-              <script>
-                setInterval(() => {
-                  const isBlack = document.body.style.backgroundColor === 'black';
-                  const bg = isBlack ? 'white' : 'black';
-                  const fg = isBlack ? 'black' : 'white';
-                  document.body.style.backgroundColor = bg;
-                  document.body.style.color = fg;
-
-                  document.querySelectorAll('.smile').forEach(s => {
-                    s.style.borderColor = fg;
-                    s.querySelectorAll('div').forEach(d => d.style.background = fg);
-                    s.querySelector('.mouth').style.borderBottomColor = fg;
-                  });
-                }, 400);
-              <\/script>
-            </div>
-          </body>
-        `);
+      function startFlackern() {
+        if (flackerIntervalId !== null) return; // schon gestartet, nicht nochmal
+        // Initial setzen (aktuell schwarzer Hintergrund)
+        let isBlack = true;
+        setColors(isBlack);
+        flackerIntervalId = setInterval(() => {
+          isBlack = !isBlack;
+          setColors(isBlack);
+        }, FLACKER_MS);
       }
-    }
 
-    clickCatcher.addEventListener('click', startChaos);
+      function openPopups(count = 6) {
+        for (let i = 0; i < count; i++) {
+          // Öffne Popup ohne Audio-Tag darin (Audio läuft nur im Hauptfenster)
+          const left = Math.floor(Math.random() * 300);
+          const top = Math.floor(Math.random() * 200);
+          const win = window.open("", "", `width=600,height=400,left=${left},top=${top}`);
+          if (!win) continue;
+          // Schreibe minimal identischen HTML-Block (keine audio-tags)
+          win.document.write(`
+            <!doctype html>
+            <html>
+              <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width,initial-scale=1"/>
+                <title>you are an idiot</title>
+                <style>
+                  html,body{height:100%;margin:0;background:#000;color:#fff;font-family:"Times New Roman",serif;display:flex;align-items:center;justify-content:center;}
+                  h1{font-size:80px;margin:0;font-weight:normal;text-align:center}
+                  .smiles{display:flex;gap:36px;justify-content:center;margin-top:28px}
+                  .smile{width:70px;height:70px;border:4px solid #fff;border-radius:50%;position:relative;box-sizing:border-box}
+                  .smile::before,.smile::after{content:"";position:absolute;top:20px;width:10px;height:10px;background:#fff;border-radius:50%}
+                  .smile::before{left:15px}.smile::after{right:15px}
+                  .mouth{position:absolute;left:50%;bottom:15px;width:35px;height:15px;transform:translateX(-50%);border-bottom:4px solid #fff;border-radius:0 0 35px 35px;box-sizing:border-box}
+                </style>
+              </head>
+              <body>
+                <div style="text-align:center">
+                  <h1>you are an idiot</h1>
+                  <div class="smiles">
+                    <div class="smile"><div class="mouth"></div></div>
+                    <div class="smile"><div class="mouth"></div></div>
+                    <div class="smile"><div class="mouth"></div></div>
+                  </div>
+                </div>
+                <script>
+                  // Popup flackert lokal, synchroner Wechsel durch Lesen des body background
+                  let lastIsBlack = true;
+                  setInterval(() => {
+                    const isBlack = document.body.style.backgroundColor === 'black' || document.body.style.backgroundColor === '' ? true : (document.body.style.backgroundColor === 'white' ? false : !lastIsBlack);
+                    const bg = isBlack ? 'white' : 'black';
+                    const fg = isBlack ? 'black' : 'white';
+                    document.body.style.backgroundColor = bg;
+                    document.body.style.color = fg;
+                    document.querySelectorAll('.smile').forEach(s=>{
+                      s.style.borderColor = fg;
+                      s.querySelectorAll('div').forEach(d=>d.style.background = fg);
+                      s.querySelector('.mouth').style.borderBottomColor = fg;
+                    });
+                    lastIsBlack = !lastIsBlack;
+                  }, ${FLACKER_MS});
+                <\/script>
+              </body>
+            </html>
+          `);
+          // optional: focus the popup briefly
+          try { win.focus(); } catch(e){}
+        }
+      }
+
+      function startChaosOnce() {
+        // nur einmal ausführen
+        startFlackern();
+        // Musik starten (dieser play() wird nur durch echten user-click ausgelöst und funktioniert typischerweise)
+        audio.play().catch(()=>{ /* still silent if browser blocks; but since triggered by click it should work */ });
+        openPopups(6);
+      }
+
+      // Klick nur einmal: startet Musik + Popups + Flackern
+      clickCatcher.addEventListener('click', function handleClick() {
+        clickCatcher.removeEventListener('click', handleClick);
+        clickCatcher.remove(); // entferne unsichtbares Button
+        startChaosOnce();
+      });
+    })();
   </script>
 </body>
 </html>
