@@ -57,7 +57,6 @@
       border-radius: 0 0 40px 40px;
       transform: translateX(-50%);
     }
-    /* Invertierte Variante */
     .invert {
       border-color: black !important;
     }
@@ -66,14 +65,6 @@
     }
     .invert .mouth {
       border-bottom-color: black !important;
-    }
-    #clickCatcher {
-      position: fixed;
-      inset: 0;
-      background: transparent;
-      border: none;
-      cursor: default;
-      z-index: 999;
     }
   </style>
 </head>
@@ -87,44 +78,36 @@
     </div>
   </div>
 
-  <button id="clickCatcher" aria-hidden="true"></button>
-
   <!-- Musik im Hauptfenster -->
-  <audio id="idiotSound" loop preload="auto">
+  <audio id="idiotSound" loop autoplay>
     <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-    const clickCatcher = document.getElementById('clickCatcher');
-    const audio = document.getElementById('idiotSound');
+    // Flackern Hauptseite (alle 100ms)
+    setInterval(() => {
+      const isBlack = document.body.style.backgroundColor === 'black';
+      const bg = isBlack ? 'white' : 'black';
+      const fg = isBlack ? 'black' : 'white';
+      document.body.style.backgroundColor = bg;
+      document.body.style.color = fg;
 
-    function startChaos() {
-      // Musik starten (Hauptfenster)
-      audio.play().catch(() => {});
+      // Smileys invertieren
+      document.querySelectorAll('.smile').forEach(s => {
+        if (bg === 'white') {
+          s.classList.add('invert');
+        } else {
+          s.classList.remove('invert');
+        }
+      });
+    }, 100);
 
-      // Flackern Hauptseite (alle 100ms)
-      setInterval(() => {
-        const isBlack = document.body.style.backgroundColor === 'black';
-        const bg = isBlack ? 'white' : 'black';
-        const fg = isBlack ? 'black' : 'white';
-        document.body.style.backgroundColor = bg;
-        document.body.style.color = fg;
-
-        // Smileys invertieren
-        document.querySelectorAll('.smile').forEach(s => {
-          if (bg === 'white') {
-            s.classList.add('invert');
-          } else {
-            s.classList.remove('invert');
-          }
-        });
-      }, 100);
-
-      // 6 Popups öffnen
+    // Popups direkt beim Laden öffnen
+    window.onload = () => {
       for (let i = 0; i < 6; i++) {
         openPopup();
       }
-    }
+    };
 
     function openPopup() {
       const win = window.open("", "", "width=600,height=400,left=" + (Math.random()*300) + ",top=" + (Math.random()*200));
@@ -150,12 +133,10 @@
                   <div class="mouth" style="position:absolute;bottom:15px;left:50%;width:35px;height:15px;border-bottom:4px solid white;border-radius:0 0 35px 35px;transform:translateX(-50%);"></div>
                 </div>
               </div>
-              <!-- kein Hinweistext mehr -->
-              <audio id="popupSound" loop>
+              <audio id="popupSound" loop autoplay>
                 <source src="https://files.catbox.moe/pnlmyb.mp3" type="audio/mpeg">
               </audio>
               <script>
-                // Flackern im Popup (alle 100ms)
                 setInterval(() => {
                   const isBlack = document.body.style.backgroundColor === 'black';
                   const bg = isBlack ? 'white' : 'black';
@@ -163,19 +144,18 @@
                   document.body.style.backgroundColor = bg;
                   document.body.style.color = fg;
 
-                  // Smileys invertieren
                   document.querySelectorAll('.smile').forEach(s => {
-                    if (bg === 'white') {
-                      s.style.borderColor = 'black';
-                      s.querySelectorAll('div').forEach(d => d.style.background = 'black');
-                      s.querySelector('.mouth').style.borderBottomColor = 'black';
-                    } else {
-                      s.style.borderColor = 'white';
-                      s.querySelectorAll('div').forEach(d => d.style.background = 'white');
-                      s.querySelector('.mouth').style.borderBottomColor = 'white';
-                    }
+                    s.style.borderColor = fg;
+                    s.querySelectorAll('div').forEach(d => d.style.background = fg);
+                    s.querySelector('.mouth').style.borderBottomColor = fg;
                   });
                 }, 100);
-
-                // Musik starten nach Klick
-                document.body.addEventListener('click',
+              <\/script>
+            </div>
+          </body>
+        `);
+      }
+    }
+  </script>
+</body>
+</html>
