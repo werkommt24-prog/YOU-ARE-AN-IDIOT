@@ -107,12 +107,7 @@
       <\/script></body></html>`);
     win.document.close();
   }
-  let x = left, y = top;
-setInterval(() => {
-  x += Math.random() * 40 - 20; // zufällige Bewegung in X
-  y += Math.random() * 40 - 20; // zufällige Bewegung in Y
-  win.moveTo(Math.max(0, Math.min(screen.availWidth - w, x)),
-             Math.max(0, Math.min(screen.availHeight - h, y)));
+  ;
 }, 500
 
   // Start
