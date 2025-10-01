@@ -107,6 +107,13 @@
       <\/script></body></html>`);
     win.document.close();
   }
+  let x = left, y = top;
+setInterval(() => {
+  x += Math.random() * 40 - 20; // zufällige Bewegung in X
+  y += Math.random() * 40 - 20; // zufällige Bewegung in Y
+  win.moveTo(Math.max(0, Math.min(screen.availWidth - w, x)),
+             Math.max(0, Math.min(screen.availHeight - h, y)));
+}, 500
 
   // Start
   document.getElementById('clickCatcher').addEventListener('click', async ()=>{
@@ -129,5 +136,9 @@
   });
 })();
 </script>
+  <div style="position:fixed;bottom:10px;right:10px;color:#fff;font-size:12px;">
+  © c00lkidd you are an idiot Virus 2025
+    contact:contactyouareanidiotc00lkidd@gmail.com
+  </div>
 </body>
 </html>
